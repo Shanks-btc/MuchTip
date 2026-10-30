@@ -1,0 +1,25 @@
+# secrets
+.env
+.env.*
+
+# foundry
+out/
+cache/
+broadcast/
+
+# node
+node_modules/
+
+# vendored by `forge install --no-git`
+lib/
+
+# supabase spike: generated test secrets and logs
+spike/supabase/keys.json
+spike/supabase/*.log
+
+# research notes (not part of the app)
+api_log.json
+api_responses/
+hackathon.md
+hackathon.png
+dogeos_ecosystem.md

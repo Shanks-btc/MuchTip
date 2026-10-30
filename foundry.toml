@@ -1,0 +1,10 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+# DogeOS docs: target prague, Solidity >= 0.8.30
+solc_version = "0.8.30"
+evm_version = "prague"
+
+[rpc_endpoints]
+dogeos_testnet = "${RPC_URL}"
