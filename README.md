@@ -150,6 +150,8 @@ EVM target `prague`, Solidity 0.8.30.
 
 - `verified.md`: what was checked live and what is still unverified.
 - `FEES.md`: measured fees, why they move, and how the UI should show them.
+- `docs/backend.md`: the Supabase backend (`resolve`, `sign-claim`, `feed` Edge Functions, migrations, tests, how to deploy).
+- `supabase/`: migrations, Edge Functions and their tests.
 - `docs/resolve-plan.md`: plan for the handle → X id Edge Function and its Supabase cache table.
 - `spike/supabase/`: harness that tested Supabase's X login and identity handling against a real auth server.
 - `verified-testnet-baseline.md`: earlier research on the DogeOS testnet (RPC, chain, faucet).

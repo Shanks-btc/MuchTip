@@ -10,7 +10,9 @@
     "build": "forge build",
     "test": "forge test",
     "test:edge-check": "node spike/supabase/test-edge-check.cjs",
-    "simulate": "node scripts/tipescrow-e2e.cjs simulate https://rpc.testnet.dogeos.com/"
+    "simulate": "node scripts/tipescrow-e2e.cjs simulate https://rpc.testnet.dogeos.com/",
+    "test:functions": "deno test --allow-env --allow-net --allow-read supabase/functions",
+    "test:integration": "bash supabase/tests/run-integration.sh"
   },
   "dependencies": {
     "ethers": "6.13.4"

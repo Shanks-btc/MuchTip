@@ -1,0 +1,16 @@
+# Minimal Supabase CLI config. See docs/backend.md. Project-level settings (auth providers, URLs) live in the hosted
+# project's dashboard; `supabase link` ties this folder to it.
+project_id = "muchtip"
+
+# verify_jwt = false for all three functions:
+#  - resolve and feed are public.
+#  - sign-claim authenticates the caller itself with auth.getUser(jwt) and needs the user's own session token; the
+#    platform-level JWT check would also reject the newer non-JWT project API keys (sb_publishable_...).
+[functions.resolve]
+verify_jwt = false
+
+[functions.sign-claim]
+verify_jwt = false
+
+[functions.feed]
+verify_jwt = false
