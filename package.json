@@ -1,0 +1,24 @@
+{
+  "name": "muchtip",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DOGE tips to X accounts on DogeOS Chikyū testnet: TipEscrow contract, deploy/e2e scripts, Supabase auth spike",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "test:edge-check": "node spike/supabase/test-edge-check.cjs",
+    "simulate": "node scripts/tipescrow-e2e.cjs simulate https://rpc.testnet.dogeos.com/"
+  },
+  "dependencies": {
+    "ethers": "6.13.4"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "2.117.3"
+  },
+  "overrides": {
+    "ws": "8.22.1"
+  }
+}

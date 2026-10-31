@@ -1,7 +1,12 @@
 # DOGE tips to X accounts, on DogeOS Chikyū testnet
 
-Reference implementation for the *Vibe Code on DOGE* hackathon. It will later be ported into Noah AI (see
-`PORTING.md`, written at the end of Phase 5). Not audited. Testnet only.
+Reference implementation for the *Vibe Code on DOGE* hackathon. It will later be ported into Noah AI. Not audited.
+Testnet only.
+
+**Live deployment (Chikyū testnet, chain 6281971):**
+[`0x207652b0767F9f19d24B5300E2123D415167aCeF`](https://blockscout.testnet.dogeos.com/address/0x207652b0767F9f19d24B5300E2123D415167aCeF),
+refund delay 600 s, minimum tip 5 DOGE. Details and every transaction hash: `deployment.json`, `verified.md` section 6a.
+Its verifier is a **test key**, to be replaced with `setVerifier` before real use.
 
 **Idea:** anyone can tip DOGE to an X account. The DOGE waits in a contract until the account's owner signs in with
 X and claims it; the tipper can take it back after a delay if nobody claims.
@@ -92,9 +97,22 @@ rejects it. Tests: `spike/supabase/run-hardening.sh` runs it against a real GoTr
 identity, x + x and x + another provider, which the live harness cannot create. Not tested against GoTrue: the phone
 provider itself (only that GoTrue refuses phone sign-up when it is disabled).
 
-## Commands
+## Setup (clone and run)
 
-Foundry (`forge`) and Node are required; `lib/forge-std` and `node_modules/ethers` are installed locally.
+Needs [Foundry](https://getfoundry.sh) (developed with 1.8.3), Node 20+ with npm, and `git`. Docker is only needed for
+the auth-hardening tests. `lib/`, `node_modules/` and `out/` are gitignored, so a fresh clone fetches them:
+
+```
+git clone https://github.com/Shanks-btc/MuchTip.git && cd MuchTip
+forge install foundry-rs/forge-std@v1.11.0 --no-git    # test library, pinned; --no-git keeps lib/ out of version control
+npm ci                                                 # ethers 6.13.4 and supabase-js 2.117.3, pinned by package-lock.json
+forge build                                            # solc 0.8.30 is downloaded on first use; the scripts read out/
+forge test                                             # about a minute: 53 unit/fuzz tests + 3 invariants (128,000 calls)
+npm run test:edge-check                                # claim-gate table test, no Docker
+npm run simulate                                       # read-only check against the live testnet RPC (needs .env, below)
+```
+
+## Commands
 
 ```
 forge test                                                   # unit/fuzz tests + 3 invariants (128,000 random calls, incl. sub-minimum tips)
@@ -106,9 +124,21 @@ node scripts/tipescrow-e2e.cjs live https://rpc.testnet.dogeos.com/        # thr
 bash spike/supabase/run-hardening.sh                         # auth-hardening tests (needs Docker; see the script header)
 ```
 
-`.env` (gitignored) holds: `PRIVATE_KEY` (deployer), `VERIFIER_PRIVATE_KEY` / `VERIFIER_ADDRESS` (test verifier;
-the production key lives only in a Supabase secret), optional `OWNER_ADDRESS` (default: the deployer),
-`REFUND_DELAY_SECONDS`, `MIN_TIP_WEI`, `RPC_URL`, `CHAIN_ID`. Never commit it.
+`deploy.cjs` overwrites `deployment.json`, and `tipescrow-e2e.cjs live` overwrites `e2e-result.json`. Both files are the
+committed record of the live run, so run those two only if you mean to redeploy or re-test, and with your own keys.
+
+`.env` is gitignored and **not** in the repo; create it yourself (never commit it):
+
+```
+RPC_URL=https://rpc.testnet.dogeos.com/
+CHAIN_ID=6281971
+PRIVATE_KEY=0x…                 # funded deployer: deploy.cjs, fee-check.cjs, e2e live
+VERIFIER_PRIVATE_KEY=0x…        # test verifier key: e2e simulate/live (the production key lives only in a Supabase secret)
+VERIFIER_ADDRESS=0x…            # that key's address: deploy.cjs, fee-check.cjs
+REFUND_DELAY_SECONDS=600        # optional, default 604800 (7 days)
+MIN_TIP_WEI=5000000000000000000 # optional, default 0 (no minimum); 5 DOGE
+# OWNER_ADDRESS=0x…             # optional, default: the deployer
+```
 
 ## Network
 
@@ -122,4 +152,5 @@ EVM target `prague`, Solidity 0.8.30.
 - `FEES.md`: measured fees, why they move, and how the UI should show them.
 - `docs/resolve-plan.md`: plan for the handle → X id Edge Function and its Supabase cache table.
 - `spike/supabase/`: harness that tested Supabase's X login and identity handling against a real auth server.
-- `verified-testnet-baseline.md`, `dogeos_ecosystem.md`, `hackathon.md`: earlier research.
+- `verified-testnet-baseline.md`: earlier research on the DogeOS testnet (RPC, chain, faucet).
+- `deployment.json`, `e2e-result.json`, `e2e-result.testnet-v1.json`: addresses and transaction hashes of the live runs.
