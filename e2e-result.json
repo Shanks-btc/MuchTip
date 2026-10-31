@@ -1,0 +1,73 @@
+{
+  "chainId": 6281971,
+  "refundDelaySeconds": 45,
+  "minTipWei": "10000000000000000",
+  "deploy": "0xcd7b167307150e391bec4b2067abeb8d759e4da76e722200a769e4ceb5c9182d",
+  "contract": "0xC48AAb30478bF9427428F62f04853b25Ca703986",
+  "tipA": "0x62cab35312b3e66a8cf99a00fc5b1a45e88d48bf492490164957c60d08849899",
+  "claim": "0xa0c9003fea4f70bc928ede08718e69d7e5950fb7dcdd0db7d927d74e6629d08a",
+  "tipB": "0x1d681b4317d26576db25766c7ef2237251d180535fea4085dc43c1063ed05a77",
+  "refund": "0xe011ef556d8556a0b9bd5ea1349771af0f64cf9b72806f8a229cee00df177ff8",
+  "tipC": "0x87dff1dbd89fe4d2bedf84795d7fdafe1fbf7832060acba91e01eaaf617dfb83",
+  "rotate": "0xbb41d012cda7bec8889c50c7b6698aabe80e113c76a4fb39758aa89d3fc3a91e",
+  "claimC": "0x06fda845730bdc4246e004be5c31a4bcb5500dc7dfe4d6b1fe897bbc32624d34",
+  "refundNetToTipper": "-0.099419373898381953",
+  "fees": {
+    "deploy": {
+      "oracleQuote": "2272671426102437759",
+      "l1Fee": "763590960261087942",
+      "execFee": "27426155303340",
+      "totalFee": "763618386416391282",
+      "gasUsed": "0x1ab071"
+    },
+    "tipA": {
+      "oracleQuote": "21879368540782663",
+      "l1Fee": "21879368540782663",
+      "execFee": "2139801618328",
+      "totalFee": "21881508342400991",
+      "gasUsed": "0x21512"
+    },
+    "claim": {
+      "oracleQuote": "59596574126250947",
+      "l1Fee": "35143072150623963",
+      "execFee": "1862044185216",
+      "totalFee": "35144934194809179",
+      "gasUsed": "0x1cfe0"
+    },
+    "tipB": {
+      "oracleQuote": "21879368540782663",
+      "l1Fee": "21879368540782663",
+      "execFee": "1871671771528",
+      "totalFee": "21881240212554191",
+      "gasUsed": "0x1d246"
+    },
+    "refund": {
+      "oracleQuote": "21487611007655256",
+      "l1Fee": "18768297065317180",
+      "execFee": "697153281788",
+      "totalFee": "18768994218598968",
+      "gasUsed": "0xadad"
+    },
+    "tipC": {
+      "oracleQuote": "22699254688291968",
+      "l1Fee": "22699254688291968",
+      "execFee": "1871671771528",
+      "totalFee": "22701126360063496",
+      "gasUsed": "0x1d246"
+    },
+    "rotate": {
+      "oracleQuote": "21487611007655256",
+      "l1Fee": "21487611007655256",
+      "execFee": "450991266296",
+      "totalFee": "21488061998921552",
+      "gasUsed": "0x705a"
+    },
+    "claimC": {
+      "oracleQuote": "61829838101582144",
+      "l1Fee": "36459989409159521",
+      "execFee": "1201911638416",
+      "totalFee": "36461191320797937",
+      "gasUsed": "0x12b6c"
+    }
+  }
+}

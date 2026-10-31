@@ -1,15 +1,15 @@
 # Feasibility spike: DOGE tips to X accounts on DogeOS Chikyū
 
-Updated 2026-10-30. Spike only: no frontend yet.
+Updated 2026-10-31. Spike only: no frontend yet.
 `VERIFIED` = I saw it myself (source link, command output, tx hash). `UNVERIFIED` = not tested, or inferred; the reason is given.
 
 ## Verdict: PRIMARY PATH FEASIBLE, with 5 open risks
 
-The contract logic is fully tested (54 tests) and a real deploy → tip → claim → refund run succeeded on Chikyū, with every transaction confirmed on the explorer. **That live run was of the previous revision;** the final revision (owner, `setVerifier`, 600 s delay, 5 DOGE minimum tip) has been run end to end on a local chain with Chikyū's chain ID and simulated read-only on the real RPC, but not yet live on Chikyū (waiting for your funding). Supabase's real auth server (GoTrue) gives a safe way to learn a user's X id, as long as the Edge Function is written the way section 3c describes.
+The contract logic is fully tested (54 tests) and a real deploy → tip → claim → refund run succeeded on Chikyū, with every transaction confirmed on the explorer. **The final contract (owner, `setVerifier`, 600 s delay, 5 DOGE minimum tip) is now live on Chikyū at [`0x207652b0…aCeF`](https://blockscout.testnet.dogeos.com/address/0x207652b0767F9f19d24B5300E2123D415167aCeF)** (deployed 2026-10-31, block 9065839; parameters read back from the chain and matching `.env`). Its full deploy → tip → claim → refund → rotation flow ran live on a throwaway copy with identical code (section 6a), and every transaction was read back from the explorer as `status=ok`. Supabase's real auth server (GoTrue) gives a safe way to learn a user's X id, as long as the Edge Function is written the way section 3c describes.
 
 Open risks, most important first:
 
-1. **Fees are far higher than gas suggests, and they move a lot.** DogeOS adds an `l1Fee` that is almost the whole fee: at the e2e run **0.22 DOGE per tip, 0.35 per claim, 0.24 per refund, 6.83 per deploy**. A wallet that shows only gas under-quotes by a factor of about 100,000. The fee oracle's quote for the *same* transaction swung **7.4× over 3.3 hours**, so a fixed range is wrong; the UI must quote live from the oracle (a quote can be made before signing). Details and UI rules: [FEES.md](FEES.md).
+1. **Fees are far higher than gas suggests, and they move a lot.** DogeOS adds an `l1Fee` that is almost the whole fee: at the 2026-10-30 e2e run **0.22 DOGE per tip, 0.35 per claim, 0.24 per refund, 6.83 per deploy**; a day later (final run) the same actions cost **0.022 / 0.035 / 0.019 / 0.77**, about 10× less. A wallet that shows only gas under-quotes by a factor of about 100,000. The fee oracle's quote for the *same* transaction swung **7.4× over 3.3 hours**, so a fixed range is wrong; the UI must quote live from the oracle (a quote can be made before signing). Details and UI rules: [FEES.md](FEES.md).
 2. **X login probably needs paid X API credits** (3a). Not tested, since I have no X developer account.
 3. **Noah has no documented EVM deploy or X-login path** (item 1). Test this in Noah early.
 4. **No real X, no real hosted Supabase project was used.** X was mocked against the real GoTrue server (3b to 3d). A hosted project may run a different version.
@@ -26,7 +26,7 @@ Open risks, most important first:
 | 3d | Strict check (reject any non-`x` identity or more than one identity) + provider hardening | VERIFIED against real GoTrue (X mocked); 2 scenarios inconclusive, see 3d |
 | 4 | DogeOS RPC, explorer, faucet | VERIFIED |
 | 5 | TipEscrow keyed by X id + refund + owner/rotation + minTip, full test suite | VERIFIED (54/54 pass) |
-| 6 | Live e2e on Chikyū: tip → claim, tip → refund | VERIFIED for the previous revision (5 txs confirmed); **final revision not yet run live** |
+| 6 | Live e2e on Chikyū: tip → claim, tip → refund, rotation, min-tip | VERIFIED for the final contract (section 6a: 9 txs `status=ok`) and for the previous revision (section 6b: 5 txs) |
 | 7 | MyDoge and dapps | PARTIAL: docs VERIFIED; no hands-on test |
 
 ---
@@ -241,7 +241,49 @@ How the contract handles refunds: each tip is stored with its own id. A claim pa
 
 **Still true (spike limits):** one verifier key at a time (a leak means every escrowed tip can be claimed by whoever holds it, until the owner rotates it); the owner key is also high-value and cannot be transferred; claim pays the whole balance; the contract cannot tell a real X id from a made-up one, so the tip page must resolve handles correctly (docs/resolve-plan.md). `forge build` prints lint notes about `block.timestamp` comparisons, the `uint64` timestamp cast and the payout to a signed recipient; all are intentional.
 
-## 6. Live e2e on Chikyū — VERIFIED for the previous revision; the final revision is NOT yet run live
+## 6. Live e2e on Chikyū — VERIFIED for the final contract (6a) and for the previous revision (6b)
+
+### 6a. Final contract — LIVE-VERIFIED, 2026-10-31 (~13:15 UTC)
+
+**Real deployment:** [`0x207652b0767F9f19d24B5300E2123D415167aCeF`](https://blockscout.testnet.dogeos.com/address/0x207652b0767F9f19d24B5300E2123D415167aCeF), chain 6281971, deployed by `scripts/deploy.cjs` (record in `deployment.json`).
+
+| Read-back from the chain (`eth_call`) | Value | Matches `.env` |
+|---|---|---|
+| `owner()` | `0x1BE5DB49a70d633c6e6AF7900598118Fb65419AE` (the deployer) | yes |
+| `verifier()` | `0xB63301AF6f319f1B2B93D637B730AE9604D45b86` (`VERIFIER_ADDRESS`, the **test** verifier whose key is in `.env`) | yes |
+| `refundDelay()` | 600 s | yes (`REFUND_DELAY_SECONDS=600`) |
+| `minTip()` | 5.0 DOGE (5000000000000000000 wei) | yes (`MIN_TIP_WEI`) |
+| `tipCount()`, balance | 0, 0 DOGE | untouched since deploy |
+
+Deploy tx [`0x8a0dc51f…af23`](https://blockscout.testnet.dogeos.com/tx/0x8a0dc51f03ad67c2c945a83210d2605921e2b15d4d2ce69f5d553233d2d5af23), block 9065839, `status=ok`. Runtime code is 7,731 bytes.
+
+**The flow ran on a throwaway copy, not on the real contract.** `tipescrow-e2e.cjs live` deploys its own instance with `refundDelay = 45 s` and `minTip = 0.01 DOGE` (so a test costs cents, not 5 DOGE per tip), at [`0xC48AAb30478bF9427428F62f04853b25Ca703986`](https://blockscout.testnet.dogeos.com/address/0xC48AAb30478bF9427428F62f04853b25Ca703986). Its runtime code and the real contract's are the same length and differ in **18 bytes, all inside the artifact's immutable slots** (`owner`, `refundDelay`, `minTip`); there is no other difference. The 5 DOGE minimum and 600 s delay of the real instance are therefore covered by the read-back above, `test_HackathonParameters`, and the local deploy, not by a live 5 DOGE tip.
+
+All nine transactions were read back from the Blockscout API: `status=ok`, `result=success`.
+
+| Step | Tx hash | Block | Gas used | Total fee (DOGE) |
+|---|---|---|---|---|
+| **Real deploy** | [`0x8a0dc51f03ad67c2c945a83210d2605921e2b15d4d2ce69f5d553233d2d5af23`](https://blockscout.testnet.dogeos.com/tx/0x8a0dc51f03ad67c2c945a83210d2605921e2b15d4d2ce69f5d553233d2d5af23) | 9065839 | 1,749,129 | 0.7682 |
+| e2e deploy (throwaway) | [`0xcd7b167307150e391bec4b2067abeb8d759e4da76e722200a769e4ceb5c9182d`](https://blockscout.testnet.dogeos.com/tx/0xcd7b167307150e391bec4b2067abeb8d759e4da76e722200a769e4ceb5c9182d) | 9065845 | 1,749,105 | 0.7636 |
+| Tip A (X id 2244994945, 0.01 DOGE = exactly the throwaway minimum) | [`0x62cab35312b3e66a8cf99a00fc5b1a45e88d48bf492490164957c60d08849899`](https://blockscout.testnet.dogeos.com/tx/0x62cab35312b3e66a8cf99a00fc5b1a45e88d48bf492490164957c60d08849899) | 9065848 | 136,466 | 0.0219 |
+| Claim A (verifier-signed) | [`0xa0c9003fea4f70bc928ede08718e69d7e5950fb7dcdd0db7d927d74e6629d08a`](https://blockscout.testnet.dogeos.com/tx/0xa0c9003fea4f70bc928ede08718e69d7e5950fb7dcdd0db7d927d74e6629d08a) | 9065851 | 118,752 | 0.0351 |
+| Tip B (X id 1850123456789012345, above 2^53) | [`0x1d681b4317d26576db25766c7ef2237251d180535fea4085dc43c1063ed05a77`](https://blockscout.testnet.dogeos.com/tx/0x1d681b4317d26576db25766c7ef2237251d180535fea4085dc43c1063ed05a77) | 9065853 | 119,366 | 0.0219 |
+| Refund B (after the 45 s delay) | [`0xe011ef556d8556a0b9bd5ea1349771af0f64cf9b72806f8a229cee00df177ff8`](https://blockscout.testnet.dogeos.com/tx/0xe011ef556d8556a0b9bd5ea1349771af0f64cf9b72806f8a229cee00df177ff8) | 9065871 | 44,461 | 0.0188 |
+| Tip C (X id 2244994945 again) | [`0x87dff1dbd89fe4d2bedf84795d7fdafe1fbf7832060acba91e01eaaf617dfb83`](https://blockscout.testnet.dogeos.com/tx/0x87dff1dbd89fe4d2bedf84795d7fdafe1fbf7832060acba91e01eaaf617dfb83) | 9065874 | 119,366 | 0.0227 |
+| **`setVerifier`** (owner rotates the key) | [`0xbb41d012cda7bec8889c50c7b6698aabe80e113c76a4fb39758aa89d3fc3a91e`](https://blockscout.testnet.dogeos.com/tx/0xbb41d012cda7bec8889c50c7b6698aabe80e113c76a4fb39758aa89d3fc3a91e) | 9065877 | 28,762 | **0.0215** |
+| Claim C (signed by the new key) | [`0x06fda845730bdc4246e004be5c31a4bcb5500dc7dfe4d6b1fe897bbc32624d34`](https://blockscout.testnet.dogeos.com/tx/0x06fda845730bdc4246e004be5c31a4bcb5500dc7dfe4d6b1fe897bbc32624d34) | 9065879 | 76,652 | 0.0365 |
+
+Results checked (the reverts are simulated `eth_call`s, not mined transactions):
+
+- **Minimum tip:** a tip of `minTip − 1` wei reverted `BelowMinTip`; a tip of exactly `minTip` (Tip A) succeeded.
+- **Claims:** claim A paid the recipient exactly 0.01 DOGE; claim C paid another 0.01 (recipient balance 0.02). Replay of claim A → `NonceUsed`.
+- **Refund:** early refund → `TooEarly`; after the delay refund B succeeded and `tipStatus` = 3 (Refunded); claim of the refunded tip → `NothingToClaim`; refund of the claimed tip A → `AlreadyClaimed`.
+- **Rotation:** non-owner `setVerifier` → `NotOwner`; owner `setVerifier` succeeded (`VerifierUpdated`); a claim signed by the old key → `BadSignature`; a claim signed by the new key paid out.
+- **Events** decoded from receipts: `Tipped` ×3, `Claimed` ×2 (the numeric `xId` 2244994945 in each), `Refunded` ×1.
+- **Fees:** fee = `l1Fee` + gasUsed × effectiveGasPrice. The nine fees sum to **1.710134 DOGE**; with the 0.02 DOGE paid to the claim recipient that equals the deployer's balance change to the wei (34.202386 → 32.472252). Table, oracle ratios and the `setVerifier` fee: [FEES.md](FEES.md) section 2b. The claim recipient and the rotation's new verifier are fresh random wallets the script does not save, so the 0.02 DOGE paid to the recipient is unrecoverable (as on the previous run).
+- **Not done:** source verification of the contracts on the explorer; a live tip of 5 DOGE; a tip to an account that already holds a balance.
+
+### 6b. Previous revision — 2026-10-30
 
 > **The contract below (`0x43eAa76d…`) is the revision before owner/`setVerifier` were added.** Its transactions are real and confirmed, but they say nothing about the new code. Hashes are also kept in `e2e-result.testnet-v1.json`.
 >
@@ -297,7 +339,9 @@ Sources: [DogeOS SDK docs](https://docs.dogeos.com/en/sdk), [Embedded wallets](h
 
 ## What is not verified yet
 
-- A **live run on Chikyū of the final contract** (owner, `setVerifier`, 600 s delay, 5 DOGE minimum). Needs your go; plan: `node scripts/deploy.cjs`, then `node scripts/tipescrow-e2e.cjs live …`. **Budget:** the deployer holds 34.2 DOGE. The previous contract's deploy was charged 6.83 DOGE. The oracle's quote for the final contract's deploy is about 11 DOGE now (two deploys: the real one and the e2e's throwaway), but it quoted 2.76× the actual charge for the previous deploy (one sample), so that is probably pessimistic. Plus about 3 DOGE for the e2e's other transactions. **Likely about 11 DOGE in total if the deploy quote is as pessimistic as last time (fee-check prints this), up to about 25 if it is not; a cautious worst case (quote × 1.5) is about 36**, and fees swung 7× in 3.3 h. `node scripts/fee-check.cjs` (read-only) prints the current quote against your balance right before you deploy; at the moment it says to top up by about 1.7 DOGE at the cautious setting. The `setVerifier` fee has not been measured.
+- **Done, no longer open:** the live run of the final contract (section 6a). Cost 1.730 DOGE in total (1.710 in fees, 0.02 to the claim recipient); the deployer has 32.472 DOGE left. The `setVerifier` fee is measured (0.0215 DOGE, FEES.md section 2b).
+- **The deployed contract's verifier is the test key from `.env`** (`VERIFIER_ADDRESS`), whose private key sits in a local file. Before real use, the owner should call `setVerifier` with the address of the production key held as a Supabase secret (about 0.02 DOGE at current prices).
+- The real contract itself has had no tips or claims: its flow was exercised on an identical-code throwaway copy with a 45 s delay and 0.01 DOGE minimum (section 6a). A live 5 DOGE tip into the real instance has not been made.
 - Everything under "Open items" in [docs/resolve-plan.md](docs/resolve-plan.md): a real X lookup, its billing, and the not-found response.
 - Whether the hosted Supabase dashboard has an "allow users without an email" toggle for X; a real X login at all.
 - Source verification of deployed contracts on the explorer; MyDoge hands-on; a phone test.
@@ -315,7 +359,11 @@ Sources: [DogeOS SDK docs](https://docs.dogeos.com/en/sdk), [Embedded wallets](h
 | Verifier or owner key theft | Whoever holds the verifier key can claim every escrowed tip; the owner key can swap the verifier | Owner rotates the verifier with `setVerifier` (tested); keep both keys out of the repo; note it in the submission |
 | Feed shows hashes for tips | A global Feed can't show who was tipped | Decided: `x_handles(x_id, handle, resolved_at)` written only by `resolve`; the Feed hashes ids in the browser (docs/resolve-plan.md) |
 
-## Files (nothing committed; this folder is not a git repo)
+## Files (nothing committed in this pass)
+
+- **Final deployment pass (2026-10-31):** `deployment.json` and `e2e-result.json` (new; hashes, addresses and amounts only, no keys), `FEES.md` (section 2b and updates), this file.
+- **Earlier pass:** `spike/supabase/test-edge-check.cjs` (new), `scripts/deploy.cjs` and `scripts/fee-check.cjs` (now read `MIN_TIP_WEI`), `test/TipEscrow.t.sol` (`invariant_NoTipBelowMin`).
+- **Older notes below describe earlier passes.**
 
 - **Changed this turn:** `src/TipEscrow.sol` (minTip), `test/TipEscrow.t.sol`, `scripts/deploy.cjs`, `scripts/tipescrow-e2e.cjs` (min-tip check, fee report), `README.md`, `docs/resolve-plan.md`, `.env` (adds `MIN_TIP_WEI=5000000000000000000`), `.gitignore`
 - **Deleted (last turn):** `src/Probe.sol`, `scripts/deploy-and-verify.sh`

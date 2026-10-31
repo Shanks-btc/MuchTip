@@ -1,0 +1,10 @@
+{
+  "chainId": 6281971,
+  "contract": "0x207652b0767F9f19d24B5300E2123D415167aCeF",
+  "owner": "0x1BE5DB49a70d633c6e6AF7900598118Fb65419AE",
+  "verifier": "0xB63301AF6f319f1B2B93D637B730AE9604D45b86",
+  "refundDelaySeconds": 600,
+  "minTipWei": "5000000000000000000",
+  "deployTx": "0x8a0dc51f03ad67c2c945a83210d2605921e2b15d4d2ce69f5d553233d2d5af23",
+  "deployBlock": 9065839
+}
