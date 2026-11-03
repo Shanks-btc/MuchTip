@@ -37,3 +37,14 @@ export function withoutAuthError(pathname: string, search: string, hash: string)
   const h = strip(hash);
   return `${pathname}${q ? `?${q}` : ""}${h ? `#${h}` : ""}`;
 }
+
+export const CLAIM_PATH = "/app/claim";
+
+/**
+ * Supabase sends a failed sign-in to the Site URL (or wherever it was started), e.g. /?error=…. Only the Claim page
+ * shows the error, so any other page carrying one is sent there with its query and hash unchanged. null = stay.
+ */
+export function authErrorTarget(pathname: string, search: string, hash: string): string | null {
+  if (pathname === CLAIM_PATH || !readAuthError(search, hash)) return null;
+  return `${CLAIM_PATH}${search}${hash}`;
+}

@@ -3,9 +3,10 @@
 // show the reason, offer Try again, and take the error out of the URL.
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter, useLocation } from "react-router-dom";
+import { MemoryRouter, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { readAuthError, withoutAuthError } from "../../lib/authError";
+import { AuthErrorRedirect } from "../../components/AuthErrorRedirect";
+import { authErrorTarget, readAuthError, withoutAuthError } from "../../lib/authError";
 
 vi.mock("../../env", () => ({
   ENV_ERRORS: [],
@@ -77,5 +78,35 @@ describe("Claim page after a failed X sign-in", () => {
     renderAt("/app/claim");
     expect(screen.queryByRole("alert")).toBeNull();
     expect(screen.getByRole("button", { name: /Sign in with X to claim/ })).toBeTruthy();
+  });
+});
+
+describe("a sign-in error on any other page goes to Claim", () => {
+  it("decides the target, keeping every parameter", () => {
+    const q = "?error=access_denied&error_code=access_denied&error_description=The+user+denied+the+request";
+    expect(authErrorTarget("/", q, "")).toBe(`/app/claim${q}`);
+    expect(authErrorTarget("/app", "", "#error=server_error&error_description=x")).toBe("/app/claim#error=server_error&error_description=x");
+    expect(authErrorTarget("/app/claim", q, "")).toBeNull(); // already there
+    expect(authErrorTarget("/", "?to=jack", "#faq")).toBeNull(); // no error: stay
+  });
+
+  it("from the landing page (/?error=…), the Claim page shows the error and the URL ends clean", async () => {
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={["/?error=access_denied&error_code=access_denied&error_description=The+user+denied+the+request"]}>
+          <Routes>
+            <Route element={<AuthErrorRedirect><Outlet /></AuthErrorRedirect>}>
+              <Route path="/" element={<p>Landing page</p>} />
+              <Route path="/app/claim" element={<Claim />} />
+            </Route>
+          </Routes>
+          <Where />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    expect(await screen.findByText("Sign-in with X didn't complete. Please try again.")).toBeTruthy();
+    expect(screen.getByText("The user denied the request (access_denied)")).toBeTruthy();
+    expect(screen.queryByText("Landing page")).toBeNull();
+    await waitFor(() => expect(current).toBe("/app/claim"));
   });
 });

@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Navigate, Outlet, RouterProvider, useLocation, useParams } from "react-router-dom";
 import { WagmiProvider } from "wagmi";
 import { wagmiConfig } from "./chain/wagmi";
+import { AuthErrorRedirect } from "./components/AuthErrorRedirect";
 import { ENV_ERRORS } from "./env";
 import { ToastProvider } from "./components/ui/Toast";
 import { HANDLE_RE } from "./data/api";
@@ -21,7 +22,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
 
-/** Route changes start at the top, or at #anchor when the URL has one. */
+/** Route changes start at the top, or at #anchor when the URL has one. A sign-in error on any page goes to Claim. */
 function ScrollManager() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
@@ -34,9 +35,11 @@ function ScrollManager() {
     return () => clearTimeout(t);
   }, [pathname, hash]);
   return (
-    <Suspense fallback={<div className="min-h-screen bg-paper" />}>
-      <Outlet />
-    </Suspense>
+    <AuthErrorRedirect>
+      <Suspense fallback={<div className="min-h-screen bg-paper" />}>
+        <Outlet />
+      </Suspense>
+    </AuthErrorRedirect>
   );
 }
 
