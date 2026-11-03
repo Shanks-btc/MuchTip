@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { Hex, PublicClient } from "viem";
 import { usePublicClient, useWriteContract } from "wagmi";
 import { escrowAbi } from "../../chain/abi";
@@ -12,6 +13,7 @@ import { Avatar, Skeleton } from "../../components/ui/Primitives";
 import { useConnectWallet, useSwitchToChikyu } from "../../components/ui/WalletButton";
 import { ApiError, apiErrorMessage, authConfigured, idHashOf, signClaim } from "../../data/api";
 import { useXSession, type XAccount } from "../../data/auth";
+import { readAuthError, withoutAuthError, type AuthRedirectError } from "../../lib/authError";
 import { formatCountdown, formatDoge, formatDogeFixed, formatFeeRange, relativeTime, shortAddr, shortHash } from "../../lib/format";
 import { tipLink, tipLinkText } from "../../lib/links";
 import { pageTitle, useTitle } from "../../lib/title";
@@ -21,6 +23,18 @@ import { usePhone } from "../../lib/useMedia";
 export default function Claim() {
   useTitle(pageTitle("Claim tips"));
   const x = useXSession();
+  // A failed X sign-in returns here with ?error=…&error_description=… (or #error=…). Keep the reason to show it, and
+  // take the parameters out of the address bar so a reload or a shared link doesn't show it again.
+  const { pathname, search, hash } = useLocation();
+  const navigate = useNavigate();
+  const [authError, setAuthError] = useState<AuthRedirectError | null>(() => readAuthError(search, hash));
+  useEffect(() => {
+    if (readAuthError(search, hash)) navigate(withoutAuthError(pathname, search, hash), { replace: true });
+  }, [pathname, search, hash, navigate]);
+  const retry = () => {
+    setAuthError(null);
+    void x.signIn();
+  };
   if (!x.ready)
     return (
       <div className="mx-auto max-w-[520px] rounded-panel border border-line-2 bg-white p-9" aria-busy="true">
@@ -28,10 +42,10 @@ export default function Claim() {
       </div>
     );
   if (x.account && x.session) return <Dashboard account={x.account} accessToken={x.session.access_token} onSignIn={() => x.signIn()} onSignOut={() => x.signOut()} />;
-  return <SignedOut unsupported={x.unsupportedIdentity} onSignIn={() => x.signIn()} onSignOut={() => x.signOut()} />;
+  return <SignedOut unsupported={x.unsupportedIdentity} authError={authError} onRetry={retry} onSignIn={() => x.signIn()} onSignOut={() => x.signOut()} />;
 }
 
-function SignedOut({ unsupported, onSignIn, onSignOut }: { unsupported: boolean; onSignIn: () => void; onSignOut: () => void }) {
+function SignedOut({ unsupported, authError, onRetry, onSignIn, onSignOut }: { unsupported: boolean; authError: AuthRedirectError | null; onRetry: () => void; onSignIn: () => void; onSignOut: () => void }) {
   return (
     <div className="mx-auto max-w-[520px] rounded-panel border border-ink bg-white p-6 text-center sm:p-9">
       <h1 className="m-0 text-[28px]">Were you tipped?</h1>
@@ -40,6 +54,13 @@ function SignedOut({ unsupported, onSignIn, onSignOut }: { unsupported: boolean;
           ? "This account is linked to something other than X. Sign out and sign in with X only."
           : "Sign in with the X account that was tipped. Connect any wallet and collect every waiting tip in one transaction."}
       </p>
+      {authError && (
+        <div role="alert" className="mt-5 rounded-btn border border-error-line bg-error-wash p-3.5 text-left text-[14px] leading-[1.5] text-ink">
+          <div className="font-semibold text-error">Sign-in with X didn't complete. Please try again.</div>
+          <div className="mt-1 break-words font-mono text-[12px] text-ink-3">{authError.reason ? `${authError.reason} (${authError.code})` : authError.code}</div>
+          <button type="button" onClick={onRetry} disabled={!authConfigured} className="mt-2.5 cursor-pointer border-0 bg-transparent p-0 font-semibold text-error underline disabled:cursor-not-allowed">Try again</button>
+        </div>
+      )}
       <button
         type="button"
         onClick={unsupported ? onSignOut : onSignIn}
