@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -9,7 +10,7 @@ import react from "@vitejs/plugin-react";
  * page then leaves the number out.
  */
 function contractTestCount(): number | null {
-  const dir = path.resolve(__dirname, "../test");
+  const dir = fileURLToPath(new URL("../test", import.meta.url));
   try {
     const n = fs
       .readdirSync(dir)
