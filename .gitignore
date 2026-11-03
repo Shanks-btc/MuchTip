@@ -12,7 +12,7 @@ broadcast/
 node_modules/
 
 # vendored by `forge install --no-git`
-lib/
+/lib/
 
 # supabase spike: generated test secrets and logs
 spike/supabase/keys.json
@@ -24,3 +24,8 @@ api_responses/
 hackathon.md
 hackathon.png
 dogeos_ecosystem.md
+
+# frontend build output
+frontend/dist/
+# Vercel CLI link (project/org ids)
+frontend/.vercel/

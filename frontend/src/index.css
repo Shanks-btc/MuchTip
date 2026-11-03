@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Type and motion tokens from docs/design/MuchTip-design-spec-v5.html ("Type", "Components").
+ * Inter for all text, IBM Plex Mono for numbers, hashes, addresses and small labels. No other fonts.
+ */
+@layer base {
+  :root { --ease: cubic-bezier(0.2, 0.8, 0.2, 1); }
+  /* the spec's frames use the browser's normal line height, not preflight's 1.5; text that needs more sets it */
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; line-height: normal; }
+  body { margin: 0; background: #fafaf7; color: #0e0f14; font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  *, *::before, *::after { box-sizing: border-box; }
+  a { color: inherit; }
+  p { text-wrap: pretty; }
+  /* headings: h1 Inter 500, h2 Inter 700, h3 Inter 600; all -0.045em and balanced */
+  h1, h2, h3 { font-family: Inter, system-ui, sans-serif; letter-spacing: -0.045em; line-height: 1.08; text-wrap: balance; }
+  h1 { font-weight: 500; }
+  h2 { font-weight: 700; }
+  h3 { font-weight: 600; }
+  /* Focus ring for keyboard users only. */
+  :focus:not(:focus-visible) { outline: none; }
+  :focus-visible { outline: 2px solid #0e0f14; outline-offset: 3px; }
+}
+
+@layer components {
+  /* hero h1: Inter 600, line-height 1.04, -0.05em. Components sit after base, so this beats the h1 rule's -0.045em. */
+  .mt-h1 { font-family: Inter, system-ui, sans-serif; font-weight: 600; line-height: 1.04; letter-spacing: -0.05em; text-wrap: balance; }
+  /* eyebrow labels: Plex Mono 500, 13px (12px under 640px), 0.1em, uppercase */
+  .mt-eyebrow { font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 500; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+  /* lead paragraph: Inter 400, 18px (17px under 640px), line-height 1.7 */
+  .mt-lead { font-family: Inter, system-ui, sans-serif; font-weight: 400; font-size: 18px; line-height: 1.7; text-wrap: balance; }
+  /* button labels: Inter 600, 15px */
+  .mt-btn-text { font-family: Inter, system-ui, sans-serif; font-weight: 600; font-size: 15px; }
+  @media (max-width: 639px) {
+    .mt-eyebrow { font-size: 12px; }
+    .mt-lead { font-size: 17px; }
+  }
+
+  .mt-btn { transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease; }
+  .mt-btn:not(:disabled):hover { transform: translateY(-1px); }
+  .mt-btn:not(:disabled):active { transform: scale(0.98); }
+  .mt-row { transition: background-color 0.12s ease; }
+  .mt-row:hover { background: #fbf8ee; }
+  .mt-link { text-decoration: none; transition: color 0.15s ease; }
+  .mt-link:hover { color: #8a6400; }
+  .mt-input:focus-within { box-shadow: 0 0 0 3px rgba(242, 184, 36, 0.45); }
+  .mt-input input:focus-visible { outline: none; }
+  .mt-step { transition: border-color 0.2s ease, background-color 0.2s ease; }
+  .mt-step:hover { border-color: #0e0f14; }
+
+  /* the hero phones (Build notes: transform .55s cubic-bezier(.2,.8,.2,1)) */
+  .ph { transition: transform 0.55s var(--ease), box-shadow 0.45s ease, opacity 0.35s ease; }
+  .ph-side:hover { box-shadow: 0 30px 60px -28px rgba(14, 15, 20, 0.45) !important; }
+  .ph-switch { scrollbar-width: none; }
+  .ph-switch::-webkit-scrollbar { display: none; }
+  .ph-icons i { display: block; width: 3px; background: #0e0f14; border-radius: 1px; }
+  .ph-icons i:nth-child(1) { height: 5px; }
+  .ph-icons i:nth-child(2) { height: 8px; }
+  .ph-icons i:nth-child(3) { width: 20px; height: 10px; border-radius: 3px; margin-left: 5px; }
+  @media (max-width: 860px) {
+    .ph-side { opacity: 0; pointer-events: none; }
+  }
+
+  /* activity rows: badge, parties, amount, time, tx; two lines under 720px */
+  .mt-arow { display: grid; grid-template-columns: 112px minmax(0, 1fr) 110px 120px 108px; grid-template-areas: "b p a t x"; gap: 12px; align-items: center; }
+  @media (max-width: 720px) {
+    .mt-arow { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "b a" "p p" "t x"; row-gap: 8px; }
+  }
+
+  /* FAQ answers: grid rows 0fr -> 1fr gives a smooth height without measuring */
+  .mt-collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.25s ease; }
+  .mt-collapse[data-open="true"] { grid-template-rows: 1fr; }
+  .mt-collapse > div { min-height: 0; overflow: hidden; }
+}
+
+@keyframes mt-spin { to { transform: rotate(360deg); } }
+@keyframes mt-pulse { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5); } 100% { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); } }
+@keyframes mt-pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(242, 184, 36, 0.5); } 100% { box-shadow: 0 0 0 7px rgba(242, 184, 36, 0); } }
+@keyframes mt-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes mt-shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+@keyframes mt-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes mt-toast { from { opacity: 0; transform: translate(12px, 12px); } to { opacity: 1; transform: none; } }
+
+.mt-spin { animation: mt-spin 0.8s linear infinite; }
+.mt-pulse { animation: mt-pulse 1.8s ease-out infinite; }
+.mt-pulse-gold { animation: mt-pulse-gold 1.8s ease-out infinite; }
+.mt-in { animation: mt-in 0.3s ease both; }
+.mt-toast { animation: mt-toast 0.26s ease both; }
+.mt-skel { background: linear-gradient(90deg, #efeee9 0, #f7f6f2 40%, #efeee9 80%); background-size: 800px 100%; animation: mt-shimmer 1.4s linear infinite; }
+.mt-skel-dark { background: linear-gradient(90deg, #24252c 0, #2e2f37 40%, #24252c 80%); background-size: 800px 100%; animation: mt-shimmer 1.4s linear infinite; }
+
+/*
+ * Reveal on scroll (lib/reveal.ts). [data-reveal] rises in when it enters the viewport; [data-reveal="group"] does the
+ * same for each child, staggered. Hidden only under html.mt-motion, which index.html sets before first paint when
+ * motion is allowed, so without JS or under reduced motion everything is simply visible. The animation fills
+ * backwards only, so nothing is left holding a transform after it ends (hover lifts keep working).
+ */
+.mt-motion [data-reveal]:not([data-reveal="group"]):not([data-in]),
+.mt-motion [data-reveal="group"]:not([data-in]) > * { opacity: 0; }
+.mt-motion [data-reveal]:not([data-reveal="group"])[data-in],
+.mt-motion [data-reveal="group"][data-in] > * { animation: mt-rise 0.7s var(--ease) backwards; }
+.mt-motion [data-reveal="group"][data-in] > :nth-child(2) { animation-delay: 90ms; }
+.mt-motion [data-reveal="group"][data-in] > :nth-child(3) { animation-delay: 180ms; }
+.mt-motion [data-reveal="group"][data-in] > :nth-child(4) { animation-delay: 270ms; }
+.mt-motion [data-reveal="group"][data-in] > :nth-child(5) { animation-delay: 360ms; }
+.mt-motion [data-reveal="group"][data-in] > :nth-child(n + 6) { animation-delay: 450ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .mt-motion [data-reveal]:not([data-in]), .mt-motion [data-reveal="group"] > * { opacity: 1 !important; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .mt-btn:hover, .mt-btn:active { transform: none !important; }
+}

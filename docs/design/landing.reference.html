@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MuchTip — trustless DOGE tips</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+*{box-sizing:border-box}
+a{color:#0E0F14}a:hover{color:#5C4400}
+.btn{transition:transform .18s ease, box-shadow .18s ease, background .18s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(14,15,20,.22)}
+.lift{transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+.lift:hover{transform:translateY(-6px);box-shadow:0 22px 48px rgba(14,15,20,.12);border-color:#F2B824}
+.navlink{position:relative;text-decoration:none}
+.navlink:after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:#0E0F14;transform:scaleX(0);transform-origin:left;transition:transform .2s ease}
+.navlink:hover:after{transform:scaleX(1)}
+@keyframes mt-float{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-14px) rotate(4deg)}}
+@keyframes mt-float2{0%,100%{transform:translateY(0) rotate(8deg)}50%{transform:translateY(-10px) rotate(-4deg)}}
+@keyframes mt-pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.55)}100%{box-shadow:0 0 0 10px rgba(22,163,74,0)}}
+@keyframes mt-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes mt-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes mt-draw{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
+@keyframes mt-ring{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.8);opacity:0}}
+@keyframes mt-blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes mt-fill{from{width:8%}to{width:72%}}
+.float1{animation:mt-float 5s ease-in-out infinite}
+.float2{animation:mt-float2 6.5s ease-in-out infinite}
+.pulse{animation:mt-pulse 1.6s ease-out infinite}
+.marquee{animation:mt-marquee 38s linear infinite}
+.marquee:hover{animation-play-state:paused}
+.up1{animation:mt-up .8s ease both}
+.up2{animation:mt-up .8s .15s ease both}
+.up3{animation:mt-up .8s .3s ease both}
+.up4{animation:mt-up .8s .45s ease both}
+.draw{stroke-dasharray:1400;animation:mt-draw 2.4s ease forwards}
+.ring{transform-box:fill-box;transform-origin:center;animation:mt-ring 2s ease-out infinite}
+.caret{animation:mt-blink 1s steps(1) infinite}
+.fillbar{animation:mt-fill 3.5s ease-in-out infinite alternate}
+@media (prefers-reduced-motion: reduce){
+.float1,.float2,.pulse,.marquee,.up1,.up2,.up3,.up4,.draw,.ring,.caret,.fillbar{animation:none !important}
+.draw{stroke-dasharray:none}
+}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #0E0F14; background: #FFFFFF; width: 100%; overflow-x: hidden">
+
+<!-- NAV -->
+<header style="position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); border-bottom: 1px solid #ECECEF">
+<nav style="max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+<a href="#top" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0E0F14">
+<svg width="36" height="36" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="16" fill="#F2B824" stroke="#0E0F14" stroke-width="2"/><circle cx="17" cy="20" r="4.6" fill="#0E0F14"/><circle cx="11.2" cy="14.2" r="2.3" fill="#0E0F14"/><circle cx="15" cy="10.6" r="2.3" fill="#0E0F14"/><circle cx="19.6" cy="10.6" r="2.3" fill="#0E0F14"/><circle cx="23.2" cy="14.2" r="2.3" fill="#0E0F14"/></svg>
+<span style="font-weight: 900; font-size: 22px; letter-spacing: -0.03em">MuchTip</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; border: 1px solid #0E0F14; padding: 3px 8px; border-radius: 999px">TESTNET</span>
+</a>
+<div style="display: flex; align-items: center; gap: 28px; flex-wrap: wrap">
+<a class="navlink" href="#how" style="font-size: 15px; font-weight: 500">How it works</a>
+<a class="navlink" href="#feed" style="font-size: 15px; font-weight: 500">Live feed</a>
+<a class="navlink" href="#why" style="font-size: 15px; font-weight: 500">Why trustless</a>
+<a class="navlink" href="#faq" style="font-size: 15px; font-weight: 500">FAQ</a>
+<a class="btn" href="#tip" style="text-decoration: none; background: #F2B824; color: #0E0F14; font-weight: 700; font-size: 15px; padding: 12px 22px; border-radius: 999px; border: 1.5px solid #0E0F14">Send a tip</a>
+<a class="btn" href="#claim" style="text-decoration: none; background: #0E0F14; color: #FFFFFF; font-weight: 700; font-size: 15px; padding: 12px 22px; border-radius: 999px; border: 1.5px solid #0E0F14">Claim tips</a>
+</div>
+</nav>
+</header>
+
+<!-- HERO -->
+<section id="top" style="background: {{gold}}; padding: 80px 24px 0; position: relative; overflow: hidden">
+<svg width="520" height="520" viewBox="0 0 520 520" style="position: absolute; right: -140px; top: -120px; opacity: 0.18" aria-hidden="true"><g fill="none" stroke="#0E0F14" stroke-width="1.5"><circle cx="260" cy="260" r="80"/><circle cx="260" cy="260" r="140"/><circle cx="260" cy="260" r="200"/><circle cx="260" cy="260" r="255"/></g></svg>
+<div style="max-width: 1240px; margin: 0 auto; position: relative">
+<div class="up1" style="display: inline-flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.14em; font-weight: 500; background: rgba(255,255,255,0.55); border: 1px solid rgba(14,15,20,0.2); padding: 8px 14px; border-radius: 999px">
+<span class="pulse" style="width: 8px; height: 8px; border-radius: 999px; background: #16A34A; display: inline-block"></span>TRUSTLESS TIPPING ON DOGEOS
+</div>
+<div style="margin-top: 32px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+<div style="flex: 999 1 560px; min-width: 0">
+<h1 class="up2" style="margin: 0; font-size: clamp(50px, 6.6vw, 98px); line-height: 0.96; letter-spacing: -0.05em; font-weight: 900">Tip anyone on X.<br><span style="color: #FFFFFF; -webkit-text-stroke: 2.5px #0E0F14; paint-order: stroke fill">Even before they</span><br><span style="color: #FFFFFF; -webkit-text-stroke: 2.5px #0E0F14; paint-order: stroke fill">have a wallet.</span></h1>
+<p class="up3" style="margin: 30px 0 0; max-width: 560px; font-size: 20px; line-height: 1.55; color: #2A2410">Send DOGE to any @handle. It waits in a smart contract until they log in with X and claim it — or it comes back to you if they never do.</p>
+<div class="up4" style="margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap">
+<a class="btn" href="#tip" style="text-decoration: none; background: #0E0F14; color: #FFFFFF; font-weight: 700; font-size: 17px; padding: 17px 30px; border-radius: 999px">Send a tip →</a>
+<a class="btn" href="#claim" style="text-decoration: none; background: rgba(255,255,255,0.35); border: 1.5px solid #0E0F14; color: #0E0F14; font-weight: 700; font-size: 17px; padding: 16px 29px; border-radius: 999px">Claim your tips</a>
+</div>
+</div>
+
+<!-- composer card -->
+<div style="flex: 1 1 380px; position: relative; min-height: 440px">
+<div class="float1" style="position: absolute; left: -10px; top: 6px; width: 72px; height: 72px" aria-hidden="true">
+<svg viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="33" fill="#FFD95A" stroke="#0E0F14" stroke-width="3"/><circle cx="36" cy="36" r="24" fill="none" stroke="#0E0F14" stroke-width="2" stroke-dasharray="4 5"/><text x="36" y="45" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="26" fill="#0E0F14">Ð</text></svg>
+</div>
+<div class="float2" style="position: absolute; right: 0; bottom: 18px; width: 54px; height: 54px" aria-hidden="true">
+<svg viewBox="0 0 72 72" width="54" height="54"><circle cx="36" cy="36" r="33" fill="#FFFFFF" stroke="#0E0F14" stroke-width="3"/><text x="36" y="45" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="26" fill="#0E0F14">Ð</text></svg>
+</div>
+<div class="up3" style="position: relative; margin: 40px auto 0; max-width: 400px; background: #FFFFFF; border: 2px solid #0E0F14; border-radius: 24px; padding: 24px; box-shadow: 10px 10px 0 #0E0F14">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-weight: 800; font-size: 18px">Send a tip</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; background: #FFF4D1; color: #6B4E00; padding: 4px 9px; border-radius: 999px">CHIKYŪ</span>
+</div>
+<label for="mt-handle" style="display: block; margin-top: 18px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #555">TO</label>
+<div style="margin-top: 6px; display: flex; align-items: center; justify-content: space-between; border: 1.5px solid #0E0F14; border-radius: 14px; padding: 12px 14px">
+<span style="font-size: 17px; font-weight: 600">@handle<span class="caret" style="font-weight: 400">|</span></span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; background: #E7F6EC; color: #0F6A31; padding: 4px 9px; border-radius: 999px">✓ ON X</span>
+</div>
+<input id="mt-handle" type="hidden" value="@handle">
+<div style="margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #555">AMOUNT</div>
+<div style="margin-top: 6px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{amounts}}" as="a" hint-placeholder-count="4">
+<button onClick="{{a.pick}}" style="{{a.style}}">{{a.label}}</button>
+</sc-for>
+</div>
+<div style="margin-top: 16px; padding: 12px 14px; background: #F5F6F8; border-radius: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 14px">
+<div style="display: flex; justify-content: space-between"><span style="color: #555">Tip</span><span style="font-family: 'JetBrains Mono', monospace; font-weight: 600">{{chosen}} DOGE</span></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #555">Network fee</span><span style="font-family: 'JetBrains Mono', monospace">about X · up to Y</span></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #555">Refundable after</span><span style="font-family: 'JetBrains Mono', monospace">[WINDOW]</span></div>
+</div>
+<button class="btn" style="margin-top: 16px; width: 100%; border: 0; background: #F2B824; color: #0E0F14; font: 800 17px Inter, sans-serif; padding: 16px; border-radius: 14px; box-shadow: inset 0 0 0 2px #0E0F14; cursor: pointer">Tip {{chosen}} DOGE</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ticker -->
+<div style="margin-top: 72px; background: #0E0F14; color: #FFFFFF; overflow: hidden; border-top: 2px solid #0E0F14">
+<div class="marquee" style="display: flex; width: max-content; gap: 0; padding: 16px 0">
+<sc-for list="{{ticker}}" as="t" hint-placeholder-count="8">
+<span style="display: inline-flex; align-items: center; gap: 10px; padding: 0 28px; font-family: 'JetBrains Mono', monospace; font-size: 14px; white-space: nowrap; border-right: 1px solid #2A2B33">
+<span style="color: #F2B824">Ð</span><span>{{t.text}}</span><span style="color: #8C8C96">{{t.tag}}</span>
+</span>
+</sc-for>
+</div>
+</div>
+</section>
+
+<!-- TRUST ROW -->
+<section style="border-bottom: 1px solid #ECECEF">
+<div style="max-width: 1240px; margin: 0 auto; padding: 22px 24px; display: flex; gap: 36px; flex-wrap: wrap; justify-content: space-between; font-size: 15px; font-weight: 600">
+<span>✓ Non-custodial by design</span><span>✓ Refundable if unclaimed</span><span>✓ Tied to permanent X IDs</span><span>✓ Open source contract</span><span>✓ Live on DogeOS testnet</span>
+</div>
+</section>
+
+<!-- LIVE CARD -->
+<section id="feed" style="padding: 96px 24px 40px">
+<div style="max-width: 1240px; margin: 0 auto">
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.08em">
+<span><span style="color: #8A6A00">01</span> / FOLLOW THE TIP_</span><span style="color: #555">From tipper, to escrow, to @handle</span>
+</div>
+<div style="margin-top: 16px; background: #FFFFFF; border: 1.5px solid #0E0F14; border-radius: 24px; overflow: hidden; box-shadow: 0 30px 70px rgba(14,15,20,0.12)">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 20px 24px; border-bottom: 1px solid #ECECEF">
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-family: 'JetBrains Mono', monospace; font-size: 13px">
+<span style="font-family: Inter, sans-serif; font-weight: 700; font-size: 16px">TipEscrow</span>
+<span style="color: #555">0x2076…aCeF</span>
+<span style="background: #FFF4D1; color: #6B4E00; padding: 5px 10px; border-radius: 999px">DOGE · CHIKYŪ</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; background: #E7F6EC; color: #0F6A31; padding: 5px 10px; border-radius: 999px"><span class="pulse" style="width: 7px; height: 7px; border-radius: 999px; background: #16A34A; display: inline-block"></span>LIVE</span>
+<span style="border: 1px dashed #B9B9C2; color: #555; padding: 4px 10px; border-radius: 999px">SAMPLE ROWS IN MOCKUP</span>
+</div>
+<div style="display: flex; background: #F5F6F8; border-radius: 999px; padding: 4px">
+<sc-for list="{{feedTabs}}" as="f" hint-placeholder-count="3">
+<button onClick="{{f.pick}}" style="{{f.style}}">{{f.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="position: relative; height: 240px; background: linear-gradient(#FCFCFD, #FFFFFF)">
+<div style="position: absolute; left: 24px; top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.08em; color: #555">TIPPER</div>
+<div style="position: absolute; left: 50%; top: 20px; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.08em; color: #8A6A00">ESCROW · CONTRACT</div>
+<div style="position: absolute; right: 24px; top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.08em; color: #555">@HANDLE</div>
+<svg viewBox="0 0 1200 240" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%" aria-hidden="true">
+<path d="M60 170 C 240 50, 420 70, 600 130 S 960 220, 1140 120" fill="none" stroke="#D6D6DC" stroke-width="2" stroke-dasharray="6 8"/>
+<path class="draw" d="M60 170 C 240 50, 420 70, 600 130 S 960 220, 1140 120" fill="none" stroke="#0E0F14" stroke-width="2.5"/>
+<circle cx="60" cy="170" r="9" fill="#0E0F14"/>
+<circle cx="600" cy="130" r="16" fill="#F2B824" stroke="#0E0F14" stroke-width="2.5"/>
+<circle class="ring" cx="1140" cy="120" r="22" fill="none" stroke="#F2B824" stroke-width="2"/>
+<circle cx="1140" cy="120" r="11" fill="#FFFFFF" stroke="#0E0F14" stroke-width="2.5"/>
+<circle r="8" fill="#F2B824" stroke="#0E0F14" stroke-width="2">
+<animateMotion dur="4.5s" repeatCount="indefinite" path="M60 170 C 240 50, 420 70, 600 130 S 960 220, 1140 120"/>
+</circle>
+</svg>
+<div style="position: absolute; left: calc(50% - 56px); top: 176px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #6B4E00">held · refundable</div>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 780px; border-collapse: collapse; font-size: 14px">
+<thead><tr style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.08em; color: #555; text-align: left">
+<th style="padding: 14px 24px; font-weight: 500; border-top: 1px solid #ECECEF">TX</th><th style="padding: 14px 12px; font-weight: 500; border-top: 1px solid #ECECEF">TIME</th><th style="padding: 14px 12px; font-weight: 500; border-top: 1px solid #ECECEF">ACTION</th><th style="padding: 14px 12px; font-weight: 500; border-top: 1px solid #ECECEF">FROM</th><th style="padding: 14px 12px; font-weight: 500; border-top: 1px solid #ECECEF">TO</th><th style="padding: 14px 24px; font-weight: 500; border-top: 1px solid #ECECEF; text-align: right">AMOUNT</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+<tr style="{{r.rowStyle}}">
+<td style="padding: 16px 24px; font-family: 'JetBrains Mono', monospace; color: #6B4E00">{{r.tx}} ↗</td>
+<td style="padding: 16px 12px; color: #555">{{r.time}}</td>
+<td style="padding: 16px 12px"><span style="{{r.badge}}">{{r.action}}</span></td>
+<td style="padding: 16px 12px; font-family: 'JetBrains Mono', monospace">{{r.from}}</td>
+<td style="padding: 16px 12px; font-weight: 600">{{r.to}}</td>
+<td style="padding: 16px 24px; text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 600">{{r.amount}}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 14px 24px; border-top: 1px solid #ECECEF; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #555">
+<span>In the build: rows stream live from contract events</span><a href="#feed" style="color: #6B4E00">Open full feed →</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- STATS -->
+<section style="padding: 56px 24px 32px">
+<div style="max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px">
+<sc-for list="{{stats}}" as="s" hint-placeholder-count="4">
+<div style="border-top: 3px solid #0E0F14; padding-top: 22px">
+<div style="font-size: 56px; font-weight: 800; letter-spacing: -0.05em">{{s.value}}</div>
+<div style="margin-top: 6px; color: #555; font-size: 16px">{{s.label}}</div>
+</div>
+</sc-for>
+</div>
+<div style="max-width: 1240px; margin: 14px auto 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #555">Every number is read from the chain and counts up on load. No invented stats.</div>
+</section>
+
+<!-- WHY THIS EXISTS -->
+<section id="why" style="padding: 80px 24px">
+<div style="max-width: 1240px; margin: 0 auto; background: #FFF8E6; border: 1.5px solid #F2D57A; border-radius: 28px; padding: 80px 40px; position: relative; overflow: hidden">
+<div style="position: absolute; right: -40px; bottom: -60px; font-weight: 900; font-size: 320px; line-height: 1; color: rgba(242,184,36,0.18); letter-spacing: -0.06em" aria-hidden="true">2014</div>
+<div style="position: relative; max-width: 860px">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.14em; color: #8A6A00">WHY THIS EXISTS</div>
+<h2 style="margin: 20px 0 0; font-size: clamp(38px, 4.8vw, 68px); line-height: 1.0; letter-spacing: -0.045em; font-weight: 900">Dogecoin was born for tipping.<br><span style="color: #8A6A00">The tip bot just held the coins.</span></h2>
+<p style="margin: 28px 0 0; max-width: 720px; font-size: 19px; line-height: 1.6; color: #3A3A42">In 2014 a Reddit bot made DOGE the internet's favourite way to say thanks — tens of millions of coins across hundreds of thousands of tips. But one company held everyone's balances, and when it went broke, users' coins went with it. MuchTip keeps the fun and removes the custodian.</p>
+</div>
+<div style="position: relative; margin-top: 44px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
+<div style="background: #FFFFFF; border-radius: 16px; padding: 20px 22px; border: 1px solid #F0E3B8"><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8A6A00">THEN · 2014</div><div style="margin-top: 8px; font-weight: 700; font-size: 18px">Tips held by one company</div></div>
+<div style="background: #FFFFFF; border-radius: 16px; padding: 20px 22px; border: 1px solid #F0E3B8"><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8A6A00">WHAT WENT WRONG</div><div style="margin-top: 8px; font-weight: 700; font-size: 18px">Company broke, coins gone</div></div>
+<div style="background: #0E0F14; color: #FFFFFF; border-radius: 16px; padding: 20px 22px"><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #F2B824">NOW · MUCHTIP</div><div style="margin-top: 8px; font-weight: 700; font-size: 18px">Tips held by open code</div></div>
+</div>
+<div style="position: relative; margin-top: 22px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #555">Sources linked in the build: Benzinga · CoinDesk · Gizmodo</div>
+</div>
+</section>
+
+<!-- 3 CARDS -->
+<section style="padding: 24px 24px 96px">
+<div style="max-width: 1240px; margin: 0 auto">
+<h2 style="margin: 0 0 40px; font-size: clamp(32px, 3.8vw, 52px); letter-spacing: -0.035em; font-weight: 900; text-transform: uppercase; line-height: 1">Why MuchTip can't<br>lose your DOGE</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px">
+<div class="lift" style="border: 1.5px solid #E4E4E9; border-radius: 22px; padding: 32px; background: #FFFFFF">
+<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0E0F14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+<div style="margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.1em; color: #8A6A00">01 / CUSTODY</div>
+<h3 style="margin: 12px 0 12px; font-size: 24px; line-height: 1.2; letter-spacing: -0.02em">No company holds your coins.</h3>
+<p style="margin: 0; color: #4A4A52; font-size: 16px; line-height: 1.6">Tips sit in an open smart contract on DogeOS. There's no wallet for anyone to drain and no balance for anyone to spend.</p>
+</div>
+<div class="lift" style="border: 1.5px solid #E4E4E9; border-radius: 22px; padding: 32px; background: #FFFFFF">
+<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0E0F14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+<div style="margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.1em; color: #8A6A00">02 / REFUNDS</div>
+<h3 style="margin: 12px 0 12px; font-size: 24px; line-height: 1.2; letter-spacing: -0.02em">Unclaimed? It comes back.</h3>
+<p style="margin: 0; color: #4A4A52; font-size: 16px; line-height: 1.6">If the @handle never claims, you can take your tip back after the refund window. Nothing gets stuck forever.</p>
+</div>
+<div class="lift" style="border: 1.5px solid #E4E4E9; border-radius: 22px; padding: 32px; background: #FFFFFF">
+<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0E0F14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/><path d="M16 4l2 2 3-3"/></svg>
+<div style="margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.1em; color: #8A6A00">03 / IDENTITY</div>
+<h3 style="margin: 12px 0 12px; font-size: 24px; line-height: 1.2; letter-spacing: -0.02em">Only the real @handle can claim.</h3>
+<p style="margin: 0; color: #4A4A52; font-size: 16px; line-height: 1.6">Tips are tied to the account's permanent X ID, not its name — so a renamed or recycled handle can't grab old tips.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background: #F5F6F8; padding: 104px 24px">
+<div style="max-width: 1240px; margin: 0 auto">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.14em; color: #8A6A00">HOW IT WORKS</div>
+<h2 style="margin: 18px 0 12px; font-size: clamp(38px, 4.8vw, 68px); line-height: 1.0; letter-spacing: -0.045em; font-weight: 900">Three steps.<br>One fee to claim them all.</h2>
+<p style="margin: 0; font-size: 19px; color: #4A4A52">Tip the handle. The contract holds it. They claim with X.</p>
+
+<div style="margin-top: 64px; padding-top: 56px; border-top: 1px solid #DDDDE3; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div style="flex: 1 1 420px">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.1em"><span style="display: inline-flex; width: 32px; height: 32px; align-items: center; justify-content: center; background: #0E0F14; color: #F2B824; border-radius: 999px; margin-right: 10px">01</span>TIP</div>
+<h3 style="margin: 18px 0 12px; font-size: 38px; letter-spacing: -0.035em; line-height: 1.05">Type a handle. Send DOGE.</h3>
+<p style="margin: 0; color: #4A4A52; font-size: 17px; line-height: 1.6">We look the handle up on X and lock your tip to that account's permanent ID. You see the fee before you send — no surprises.</p>
+</div>
+<div class="lift" style="flex: 1 1 420px; background: #FFFFFF; border: 1.5px solid #E4E4E9; border-radius: 22px; padding: 28px; box-shadow: 0 12px 32px rgba(14,15,20,0.06)">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #EFEFF2"><span style="font-weight: 600">@handle</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: #E7F6EC; color: #0F6A31; padding: 5px 10px; border-radius: 999px">✓ Found on X</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #EFEFF2"><span>X ID</span><span style="font-family: 'JetBrains Mono', monospace; color: #555">[PERMANENT ID]</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #EFEFF2"><span>Amount</span><span style="font-family: 'JetBrains Mono', monospace; font-weight: 600">[AMOUNT] DOGE</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0"><span>Network fee</span><span style="font-family: 'JetBrains Mono', monospace; color: #555">about X · up to Y</span></div>
+</div>
+</div>
+
+<div style="margin-top: 56px; padding-top: 56px; border-top: 1px solid #DDDDE3; display: flex; flex-wrap: wrap-reverse; gap: 48px; align-items: center">
+<div class="lift" style="flex: 1 1 420px; background: #FFFFFF; border: 1.5px solid #E4E4E9; border-radius: 22px; padding: 28px; box-shadow: 0 12px 32px rgba(14,15,20,0.06)">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #555; letter-spacing: 0.08em">HELD IN TIPESCROW</div>
+<div style="margin-top: 10px; font-size: 44px; font-weight: 800; letter-spacing: -0.04em">[AMOUNT] <span style="font-size: 20px; color: #8A6A00">DOGE</span></div>
+<div style="margin-top: 18px; height: 10px; background: #F1EEE3; border-radius: 999px; overflow: hidden"><div class="fillbar" style="width: 62%; height: 100%; background: #F2B824; border-radius: 999px"></div></div>
+<div style="margin-top: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #555"><span>waiting for @handle</span><span>refund unlocks in [TIME]</span></div>
+</div>
+<div style="flex: 1 1 420px">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.1em"><span style="display: inline-flex; width: 32px; height: 32px; align-items: center; justify-content: center; background: #0E0F14; color: #F2B824; border-radius: 999px; margin-right: 10px">02</span>ESCROW</div>
+<h3 style="margin: 18px 0 12px; font-size: 38px; letter-spacing: -0.035em; line-height: 1.05">The contract holds it. Not us.</h3>
+<p style="margin: 0; color: #4A4A52; font-size: 17px; line-height: 1.6">Your DOGE waits in the contract, visible on the explorer. If nobody claims it, the refund button unlocks for you.</p>
+</div>
+</div>
+
+<div style="margin-top: 56px; padding-top: 56px; border-top: 1px solid #DDDDE3; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div style="flex: 1 1 420px">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.1em"><span style="display: inline-flex; width: 32px; height: 32px; align-items: center; justify-content: center; background: #0E0F14; color: #F2B824; border-radius: 999px; margin-right: 10px">03</span>CLAIM</div>
+<h3 style="margin: 18px 0 12px; font-size: 38px; letter-spacing: -0.035em; line-height: 1.05">Log in with X. Claim everything.</h3>
+<p style="margin: 0; color: #4A4A52; font-size: 17px; line-height: 1.6">Connect a wallet once and every pending tip lands in a single transaction — one fee, however many tips are waiting.</p>
+</div>
+<div class="lift" style="flex: 1 1 420px; background: #FFFFFF; border: 1.5px solid #E4E4E9; border-radius: 22px; padding: 28px; box-shadow: 0 12px 32px rgba(14,15,20,0.06)">
+<div style="display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: #0F6A31"><span style="display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; background: #E7F6EC; border-radius: 999px">✓</span>Claimed</div>
+<div style="margin-top: 16px; border: 1px solid #F2D57A; background: #FFFBEF; border-radius: 14px; padding: 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between"><span>Tips collected</span><span>[N] ✓</span></div>
+<div style="display: flex; justify-content: space-between"><span>Transactions</span><span>1 ✓</span></div>
+<div style="display: flex; justify-content: space-between"><span>Verified by X login</span><span>✓</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- USE CASES (tabs) -->
+<section style="padding: 104px 24px">
+<div style="max-width: 1240px; margin: 0 auto">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.14em; color: #8A6A00">WHO TIPS ON MUCHTIP</div>
+<h2 style="margin: 18px 0 48px; font-size: clamp(38px, 4.8vw, 68px); line-height: 1.0; letter-spacing: -0.045em; font-weight: 900">One link.<br>Every kind of thank-you.</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: stretch">
+<div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{useCases}}" as="u" hint-placeholder-count="4">
+<button onClick="{{u.pick}}" style="{{u.style}}">
+<span style="display: block; font: 700 18px Inter, sans-serif">{{u.title}}</span>
+<span style="display: block; margin-top: 6px; font: 400 14px Inter, sans-serif; color: #555">{{u.short}}</span>
+</button>
+</sc-for>
+</div>
+<div style="flex: 999 1 520px; min-width: 0; background: #0E0F14; color: #FFFFFF; border-radius: 24px; padding: 40px; position: relative; overflow: hidden">
+<div style="position: absolute; right: -30px; top: -30px; width: 180px; height: 180px; border-radius: 999px; border: 2px dashed rgba(242,184,36,0.4)" aria-hidden="true"></div>
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: #F2B824">{{uc.kicker}}</div>
+<h3 style="margin: 16px 0 14px; font-size: 36px; letter-spacing: -0.035em; line-height: 1.1; max-width: 520px">{{uc.headline}}</h3>
+<p style="margin: 0; color: #C9C9D1; font-size: 17px; line-height: 1.6; max-width: 560px">{{uc.body}}</p>
+<div style="margin-top: 28px; background: #1A1B22; border: 1px solid #2A2B33; border-radius: 16px; padding: 18px 20px; max-width: 520px">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #8C8C96">SHARE ON X</div>
+<div style="margin-top: 8px; font-size: 16px; line-height: 1.5">{{uc.post}}</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- BANNER -->
+<section style="background: #0E0F14; color: #FFFFFF; padding: 128px 24px; text-align: center; position: relative; overflow: hidden">
+<svg viewBox="0 0 1200 400" preserveAspectRatio="none" style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 62%; opacity: 0.35" aria-hidden="true">
+<g stroke="#F2B824" stroke-width="1" fill="none">
+<line x1="600" y1="0" x2="-200" y2="400"/><line x1="600" y1="0" x2="100" y2="400"/><line x1="600" y1="0" x2="350" y2="400"/><line x1="600" y1="0" x2="600" y2="400"/><line x1="600" y1="0" x2="850" y2="400"/><line x1="600" y1="0" x2="1100" y2="400"/><line x1="600" y1="0" x2="1400" y2="400"/>
+<line x1="0" y1="60" x2="1200" y2="60"/><line x1="0" y1="140" x2="1200" y2="140"/><line x1="0" y1="240" x2="1200" y2="240"/><line x1="0" y1="370" x2="1200" y2="370"/>
+</g>
+</svg>
+<div style="position: absolute; left: 50%; top: 28%; transform: translateX(-50%); width: 420px; height: 420px; border-radius: 999px; background: radial-gradient(circle, rgba(242,184,36,0.28), rgba(242,184,36,0) 65%)" aria-hidden="true"></div>
+<div style="position: relative; max-width: 920px; margin: 0 auto">
+<span style="display: inline-flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.12em; border: 1px solid #F2B824; color: #F2B824; padding: 8px 16px; border-radius: 999px"><span class="pulse" style="width: 7px; height: 7px; border-radius: 999px; background: #16A34A; display: inline-block"></span>BATCH CLAIMS</span>
+<h2 style="margin: 28px 0 18px; font-size: clamp(46px, 6.6vw, 96px); line-height: 0.96; letter-spacing: -0.05em; font-weight: 900">Claim 100 tips.<br><span style="color: #F2B824">Pay one fee.</span></h2>
+<p style="margin: 0 auto; max-width: 640px; font-size: 19px; line-height: 1.6; color: #C9C9D1">Every tip waiting for your handle settles in one transaction, so small tips stay worth claiming.</p>
+<a class="btn" href="#claim" style="display: inline-block; margin-top: 36px; text-decoration: none; background: #F2B824; color: #0E0F14; font-weight: 800; font-size: 17px; padding: 17px 32px; border-radius: 999px">Check my tips →</a>
+</div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="padding: 104px 24px">
+<div style="max-width: 900px; margin: 0 auto">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.14em; color: #8A6A00; text-align: center">QUESTIONS</div>
+<h2 style="margin: 18px 0 40px; font-size: clamp(36px, 4.2vw, 56px); line-height: 1.02; letter-spacing: -0.045em; font-weight: 900; text-align: center">Much ask. Such answer.</h2>
+<div style="border-top: 1.5px solid #0E0F14">
+<sc-for list="{{faq}}" as="q" hint-placeholder-count="5">
+<div style="border-bottom: 1px solid #E4E4E9">
+<button onClick="{{q.toggle}}" aria-expanded="{{q.expanded}}" style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; background: transparent; border: 0; padding: 24px 4px; cursor: pointer; text-align: left; font: 700 19px Inter, sans-serif; color: #0E0F14">
+<span>{{q.q}}</span><span style="{{q.iconStyle}}">+</span>
+</button>
+<sc-if value="{{q.open}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 0 4px 24px; color: #4A4A52; font-size: 17px; line-height: 1.6; max-width: 760px">{{q.a}}</p>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="tip" style="padding: 24px 24px 104px">
+<div id="claim" style="max-width: 1240px; margin: 0 auto; background: {{gold}}; border: 2px solid #0E0F14; border-radius: 28px; padding: 96px 32px; text-align: center; position: relative; overflow: hidden; box-shadow: 12px 12px 0 #0E0F14">
+<div class="float1" style="position: absolute; left: 7%; top: 18%" aria-hidden="true"><svg viewBox="0 0 72 72" width="64" height="64"><circle cx="36" cy="36" r="33" fill="#FFFFFF" stroke="#0E0F14" stroke-width="3"/><text x="36" y="45" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="26" fill="#0E0F14">Ð</text></svg></div>
+<div class="float2" style="position: absolute; right: 8%; bottom: 16%" aria-hidden="true"><svg viewBox="0 0 72 72" width="80" height="80"><circle cx="36" cy="36" r="33" fill="#FFD95A" stroke="#0E0F14" stroke-width="3"/><circle cx="36" cy="36" r="24" fill="none" stroke="#0E0F14" stroke-width="2" stroke-dasharray="4 5"/><text x="36" y="45" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="26" fill="#0E0F14">Ð</text></svg></div>
+<h2 style="position: relative; margin: 0; font-size: clamp(44px, 6vw, 86px); line-height: 0.96; letter-spacing: -0.05em; font-weight: 900">Give your DOGE<br>a reason to move.</h2>
+<p style="position: relative; margin: 24px auto 0; max-width: 560px; font-size: 19px; color: #2A2410">Tip a creator, a friend or a builder. They don't need a wallet yet.</p>
+<div style="position: relative; margin-top: 36px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap">
+<a class="btn" href="#tip" style="text-decoration: none; background: #0E0F14; color: #FFFFFF; font-weight: 700; font-size: 17px; padding: 17px 32px; border-radius: 999px">Send a tip →</a>
+<a class="btn" href="#claim" style="text-decoration: none; background: rgba(255,255,255,0.4); border: 1.5px solid #0E0F14; color: #0E0F14; font-weight: 700; font-size: 17px; padding: 16px 31px; border-radius: 999px">Claim your tips</a>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background: #0E0F14; color: #FFFFFF; padding: 72px 24px 40px">
+<div style="max-width: 1240px; margin: 0 auto">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; padding-bottom: 40px; border-bottom: 1px solid #2A2B33">
+<div>
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="40" height="40" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="16" fill="#F2B824"/><circle cx="17" cy="20" r="4.6" fill="#0E0F14"/><circle cx="11.2" cy="14.2" r="2.3" fill="#0E0F14"/><circle cx="15" cy="10.6" r="2.3" fill="#0E0F14"/><circle cx="19.6" cy="10.6" r="2.3" fill="#0E0F14"/><circle cx="23.2" cy="14.2" r="2.3" fill="#0E0F14"/></svg>
+<span style="font-weight: 900; font-size: 26px; letter-spacing: -0.03em">MuchTip</span>
+</div>
+<p style="margin: 14px 0 0; color: #A8A8B3; font-size: 16px; max-width: 360px">Tip anyone on X. Even before they have a wallet.</p>
+</div>
+<a class="btn" href="#tip" style="text-decoration: none; background: #F2B824; color: #0E0F14; font-weight: 800; font-size: 16px; padding: 15px 28px; border-radius: 999px">Send a tip →</a>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; padding: 40px 0">
+<div style="display: flex; flex-direction: column; gap: 12px; font-size: 15px"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #F2B824">PRODUCT</div><a href="#tip" style="text-decoration: none; color: #C9C9D1">Send a tip</a><a href="#claim" style="text-decoration: none; color: #C9C9D1">Claim tips</a><a href="#feed" style="text-decoration: none; color: #C9C9D1">Live feed</a></div>
+<div style="display: flex; flex-direction: column; gap: 12px; font-size: 15px"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #F2B824">CONTRACT</div><a href="https://blockscout.testnet.dogeos.com" style="text-decoration: none; color: #C9C9D1">TipEscrow on explorer ↗</a><a href="https://github.com/Shanks-btc/MuchTip" style="text-decoration: none; color: #C9C9D1">Source on GitHub ↗</a></div>
+<div style="display: flex; flex-direction: column; gap: 12px; font-size: 15px"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #F2B824">HACKATHON</div><span style="color: #C9C9D1">Vibe Code on DOGE</span><span style="color: #C9C9D1">Built with Noah AI</span></div>
+<div style="display: flex; flex-direction: column; gap: 12px; font-size: 15px"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #F2B824">LEGAL</div><a href="#top" style="text-decoration: none; color: #C9C9D1">Terms</a><a href="#top" style="text-decoration: none; color: #C9C9D1">Privacy</a></div>
+</div>
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-top: 24px; border-top: 1px solid #2A2B33; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #A8A8B3">
+<span>Non-custodial. Refundable. Built on DogeOS.</span><span>Testnet demo — tips are test DOGE.</span>
+</div>
+</div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"gold":{"editor":"color","default":"#F2B824","options":["#F2B824","#FFC83D","#E8A317"]},"$preview":{"width":1440,"height":6200}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { amount: 1, feed: 0, uc: 0, faq: 0 };
+  }
+  renderVals() {
+    const s = this.state;
+    const pillOn = 'border:1.5px solid #0E0F14;background:#0E0F14;color:#F2B824;font:700 15px Inter,sans-serif;padding:11px 0;border-radius:12px;cursor:pointer';
+    const pillOff = 'border:1.5px solid #D6D6DC;background:#FFFFFF;color:#0E0F14;font:600 15px Inter,sans-serif;padding:11px 0;border-radius:12px;cursor:pointer';
+    const amountVals = [5, 25, 69, 420];
+    const amounts = amountVals.map((v, i) => ({ label: String(v), style: i === s.amount ? pillOn : pillOff, pick: () => this.setState({ amount: i }) }));
+
+    const tabOn = 'border:0;background:#FFFFFF;font:600 14px Inter,sans-serif;padding:9px 18px;border-radius:999px;box-shadow:0 1px 3px rgba(0,0,0,0.1);color:#0E0F14;cursor:pointer';
+    const tabOff = 'border:0;background:transparent;font:500 14px Inter,sans-serif;padding:9px 18px;border-radius:999px;color:#555;cursor:pointer';
+    const feedTabs = ['All', 'Tips', 'Claims'].map((l, i) => ({ label: l, style: i === s.feed ? tabOn : tabOff, pick: () => this.setState({ feed: i }) }));
+
+    const b = (bg, fg) => 'background:' + bg + ';color:' + fg + ';font:600 11px "JetBrains Mono",monospace;letter-spacing:0.06em;padding:5px 10px;border-radius:999px';
+    const tipped = b('#FFF4D1', '#6B4E00'), claimed = b('#0E0F14', '#F2B824'), refunded = b('#EEEEF1', '#4A4A52');
+    const allRows = [
+      { tx: '0x06fd…4d34', time: 'sample', action: 'CLAIMED', kind: 'claim', badge: claimed, from: 'TipEscrow', to: '@handle_one', amount: '[N] DOGE' },
+      { tx: '0x87df…fb83', time: 'sample', action: 'TIPPED', kind: 'tip', badge: tipped, from: '0x1BE5…19AE', to: '@handle_one', amount: '[N] DOGE' },
+      { tx: '0xe011…7ff8', time: 'sample', action: 'REFUNDED', kind: 'claim', badge: refunded, from: 'TipEscrow', to: '0x1BE5…19AE', amount: '[N] DOGE' },
+      { tx: '0x62ca…9899', time: 'sample', action: 'TIPPED', kind: 'tip', badge: tipped, from: '0x1BE5…19AE', to: '@handle_two', amount: '[N] DOGE' }
+    ];
+    const rows = allRows
+      .filter((r) => s.feed === 0 || (s.feed === 1 ? r.kind === 'tip' : r.kind === 'claim'))
+      .map((r, i) => ({ ...r, rowStyle: 'border-top:1px solid #ECECEF;animation:mt-up .5s ' + (i * 0.08) + 's ease both' }));
+
+    const ucData = [
+      { title: 'Creators', short: 'Share one tip link in your bio.', kicker: 'FOR CREATORS', headline: 'Your fans can tip you before you even set up a wallet.', body: 'Drop your MuchTip link in your X bio. Tips pile up safely under your account, and you claim them all in one go whenever you are ready.', post: 'Loved this thread — just tipped @handle 69 DOGE on MuchTip. Claim it whenever, it’s waiting for you.' },
+      { title: 'Community managers', short: 'Reward helpers in public.', kicker: 'FOR COMMUNITIES', headline: 'Say thanks to the people who keep your community alive.', body: 'Tip the member who answered every question or made the best meme this week. The tip is public, the thanks is real, and nobody has to share an address.', post: 'Shoutout to @handle for carrying the Discord this week. 25 DOGE sent on MuchTip.' },
+      { title: 'Fans', short: 'Tip a post, a song, a moment.', kicker: 'FOR FANS', headline: 'Liked it? Tip it. That’s the whole flow.', body: 'Type the handle, pick an amount, send. If they never claim, your DOGE comes back to you after the refund window.', post: 'This made my day. Tipped @handle 5 DOGE on MuchTip.' },
+      { title: 'Event hosts', short: 'Prizes for hackers and speakers.', kicker: 'FOR EVENTS', headline: 'Pay winners and speakers by handle, on stage.', body: 'Announce the winner, tip their @handle live, and let them claim when they get home. No collecting wallet addresses in a spreadsheet.', post: 'Congrats @handle on winning best demo — 420 DOGE prize sent via MuchTip.' }
+    ];
+    const ucOn = 'text-align:left;border:1.5px solid #0E0F14;background:#FFF8E6;padding:20px 22px;border-radius:18px;cursor:pointer;box-shadow:4px 4px 0 #0E0F14;color:#0E0F14';
+    const ucOff = 'text-align:left;border:1.5px solid #E4E4E9;background:#FFFFFF;padding:20px 22px;border-radius:18px;cursor:pointer;color:#0E0F14';
+    const useCases = ucData.map((u, i) => ({ ...u, style: i === s.uc ? ucOn : ucOff, pick: () => this.setState({ uc: i }) }));
+
+    const faqData = [
+      { q: 'Does the person I tip need a wallet?', a: 'No. Your tip is locked to their X account. They only need a wallet when they decide to claim.' },
+      { q: 'What if they never claim it?', a: 'After the refund window you can take the tip back yourself from the My tips page. On this testnet demo the window is short so you can try it.' },
+      { q: 'Can someone else claim my tip?', a: 'Only the X account you tipped. Tips are tied to the account’s permanent X ID, and claiming requires logging in with that account.' },
+      { q: 'How much does a tip cost?', a: 'There is a small DogeOS network fee. We show an estimate range before you send, because the fee can move with network conditions.' },
+      { q: 'Is this real DOGE?', a: 'Not yet. MuchTip runs on the DogeOS Chikyū testnet, so every tip uses free test DOGE from the faucet.' }
+    ];
+    const faq = faqData.map((f, i) => {
+      const open = s.faq === i;
+      return { ...f, open, expanded: open ? 'true' : 'false', iconStyle: 'display:inline-flex;width:34px;height:34px;align-items:center;justify-content:center;flex-shrink:0;border-radius:999px;font:700 20px Inter,sans-serif;transition:transform .2s ease;' + (open ? 'background:#0E0F14;color:#F2B824;transform:rotate(45deg)' : 'background:#F5F6F8;color:#0E0F14'), toggle: () => this.setState({ faq: open ? -1 : i }) };
+    });
+
+    const tickerBase = [
+      { text: '@handle_one received a tip', tag: 'sample' },
+      { text: 'Tip claimed in one transaction', tag: 'sample' },
+      { text: '@handle_two received a tip', tag: 'sample' },
+      { text: 'Unclaimed tip refunded to sender', tag: 'sample' },
+      { text: '@handle_three received a tip', tag: 'sample' },
+      { text: 'New handle joined MuchTip', tag: 'sample' }
+    ];
+    const ticker = tickerBase.concat(tickerBase);
+
+    return {
+      gold: this.props.gold ?? '#F2B824',
+      amounts,
+      chosen: String(amountVals[s.amount] ?? 25),
+      feedTabs,
+      rows,
+      useCases,
+      uc: ucData[s.uc] ?? ucData[0],
+      faq,
+      ticker,
+      stats: [
+        { value: '[LIVE]', label: 'tips sent' },
+        { value: '[LIVE]', label: 'DOGE tipped' },
+        { value: '[LIVE]', label: 'handles tipped' },
+        { value: '[LIVE]', label: 'DOGE waiting to be claimed' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
