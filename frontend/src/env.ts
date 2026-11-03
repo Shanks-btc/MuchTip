@@ -45,10 +45,13 @@ const isHttpUrl = (s: string) => {
 
 /** Pure, so it can be unit-tested with any input. Returns the parsed env or the list of problems (names only, never values). */
 export function parseEnv(src: Record<string, string | boolean | undefined>): { env: Env; errors: [] } | { env: null; errors: string[] } {
-  const get = (k: string) => {
+  // Each value is read as VITE_X, or as VITE_REACT_APP_X when VITE_X is unset: Noah AI prefixes every env variable
+  // with VITE_REACT_APP_ (docs.trynoah.ai/integrations/environment-variables). Vercel and .env.local keep using VITE_X.
+  const one = (k: string) => {
     const v = src[k];
     return typeof v === "string" && v.trim() ? v.trim() : null;
   };
+  const get = (k: string) => one(k) ?? one(k.replace(/^VITE_/, "VITE_REACT_APP_"));
   const errors: string[] = [];
   const req = (k: keyof typeof DEFAULTS) => get(k) ?? DEFAULTS[k];
 
