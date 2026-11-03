@@ -44,7 +44,7 @@ export const Spinner = ({ size = 16, className = "", strokeWidth = 3 }: P) => (
 );
 
 /** The MuchTip mark: a D in a rounded gold square. `fill` is the square, `outline` draws the ink border. */
-export const Logo = ({ size = 28, fill = "#F2B824", outline = true }: { size?: number; fill?: string; outline?: boolean }) => (
+export const Logo = ({ size = 28, fill = "#BA9F33", outline = true }: { size?: number; fill?: string; outline?: boolean }) => (
   <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" className="shrink-0">
     <rect x="1" y="1" width="30" height="30" rx="9" fill={fill} {...(outline ? { stroke: "#0E0F14", strokeWidth: 2 } : {})} />
     <path d="M10 21V11h5.2c3.1 0 5.3 2 5.3 5s-2.2 5-5.3 5H10z" fill="none" stroke="#0E0F14" strokeWidth="2.4" strokeLinejoin="round" />

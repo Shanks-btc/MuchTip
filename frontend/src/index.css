@@ -41,11 +41,15 @@
   .mt-btn { transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease; }
   .mt-btn:not(:disabled):hover { transform: translateY(-1px); }
   .mt-btn:not(:disabled):active { transform: scale(0.98); }
+  /* gold buttons: hover and pressed are the darker Dogecoin gold (ink on it is 5.2:1) */
+  .mt-btn.bg-gold:not(:disabled):hover, .mt-btn.bg-gold:not(:disabled):active { background-color: #988430; }
   .mt-row { transition: background-color 0.12s ease; }
   .mt-row:hover { background: #fbf8ee; }
   .mt-link { text-decoration: none; transition: color 0.15s ease; }
-  .mt-link:hover { color: #8a6400; }
-  .mt-input:focus-within { box-shadow: 0 0 0 3px rgba(242, 184, 36, 0.45); }
+  .mt-link:hover { color: #7a6620; }
+  /* on a gold background (footer) gold-ink would be 2.2:1, so links there hover to ink (7.4:1) */
+  .bg-gold .mt-link:hover { color: #0e0f14; }
+  .mt-input:focus-within { box-shadow: 0 0 0 3px rgba(186, 159, 51, 0.45); }
   .mt-input input:focus-visible { outline: none; }
   .mt-step { transition: border-color 0.2s ease, background-color 0.2s ease; }
   .mt-step:hover { border-color: #0e0f14; }
@@ -77,7 +81,7 @@
 
 @keyframes mt-spin { to { transform: rotate(360deg); } }
 @keyframes mt-pulse { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5); } 100% { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); } }
-@keyframes mt-pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(242, 184, 36, 0.5); } 100% { box-shadow: 0 0 0 7px rgba(242, 184, 36, 0); } }
+@keyframes mt-pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(186, 159, 51, 0.5); } 100% { box-shadow: 0 0 0 7px rgba(186, 159, 51, 0); } }
 @keyframes mt-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes mt-shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
 @keyframes mt-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }

@@ -34,7 +34,7 @@ export function Hero() {
           </p>
           <h1 className="mt-h1 mx-auto mb-0 mt-6 max-w-[1000px] text-[clamp(36px,4.6vw,66px)]">
             Tip any X handle in{" "}DOGE.<br />
-            <span className="text-gold-deep">They claim it, or you get it{" "}back.</span>
+            They claim it, or you get it{" "}back.
           </h1>
           <p className="mt-lead mx-auto mb-0 mt-6 max-w-[640px] text-gold-text">
             Send DOGE to any X handle. It’s held in a smart contract, locked to their X account, until they sign in and claim it. If they never do, it comes back to you.
