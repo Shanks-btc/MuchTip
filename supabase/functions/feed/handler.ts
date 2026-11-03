@@ -1,6 +1,6 @@
 import { ChainError, type Chain, type ChainSettings } from "../_shared/chain.ts";
 import { ethers } from "../_shared/eth.ts";
-import { clientIp, fail, HttpError, json, type Log, preflight } from "../_shared/http.ts";
+import { allowedOrigin, clientIp, fail, HttpError, json, type Log, preflight } from "../_shared/http.ts";
 import { type EventRow, syncEvents } from "../_shared/indexer.ts";
 import { enforce, ipBucket, type RateLimiter } from "../_shared/ratelimit.ts";
 import type { FeedStore } from "../_shared/stores.ts";
@@ -68,8 +68,9 @@ export function createFeedHandler(d: FeedDeps) {
   }
 
   return async (req: Request): Promise<Response> => {
+    const origin = allowedOrigin(req, d.corsOrigin);
     try {
-      if (req.method === "OPTIONS") return preflight(d.corsOrigin);
+      if (req.method === "OPTIONS") return preflight(origin);
       if (req.method !== "GET") throw new HttpError(405, "method_not_allowed", "Use GET", { allow: "GET, OPTIONS" });
 
       const q = new URL(req.url).searchParams;
@@ -139,9 +140,9 @@ export function createFeedHandler(d: FeedDeps) {
         },
         onChain,
         events: rows.map((r) => toFeedEvent(r, handles.get(r.id_hash))),
-      }, d.corsOrigin, { "cache-control": "public, max-age=3" });
+      }, origin, { "cache-control": "public, max-age=3" });
     } catch (e) {
-      return fail(e, d.corsOrigin, d.log);
+      return fail(e, origin, d.log);
     }
   };
 }

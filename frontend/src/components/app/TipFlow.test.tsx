@@ -174,3 +174,24 @@ describe("S1 send flow states", () => {
     expect(await screen.findByText("We can't reach X right now. Try again shortly. Nothing was sent.")).toBeTruthy();
   });
 });
+
+describe("the note (client-side only)", () => {
+  it("share text has no note part when none was typed", async () => {
+    const { shareText } = await import("./TipFlow");
+    const plain = "@XDevelopers I just tipped you 25 DOGE on MuchTip. Claim it with your X account: https://muchtip.test/app/claim";
+    expect(shareText("XDevelopers", parseEther("25"), "")).toBe(plain);
+    expect(shareText("XDevelopers", parseEther("25"), "   ")).toBe(plain);
+    expect(shareText("XDevelopers", parseEther("25"))).toBe(plain);
+    expect(shareText("XDevelopers", parseEther("25"), " Loved it ")).toBe('@XDevelopers I just tipped you 25 DOGE on MuchTip: "Loved it". Claim it with your X account: https://muchtip.test/app/claim');
+  });
+
+  it("the draft receipt shows no note line (and not the placeholder) until one is typed", async () => {
+    const { ReceiptTicket } = await import("../ReceiptTicket");
+    const { NOTE_PLACEHOLDER } = await import("../../data/samples");
+    const { container, rerender } = render(<ReceiptTicket status="draft" amount={parseEther("25")} to="@XDevelopers" note="" notch="#F4F3EE" />);
+    expect(container.textContent).not.toContain(NOTE_PLACEHOLDER);
+    expect(container.textContent).not.toContain("“");
+    rerender(<ReceiptTicket status="draft" amount={parseEther("25")} to="@XDevelopers" note="Loved it" notch="#F4F3EE" />);
+    expect(container.textContent).toContain("“Loved it”");
+  });
+});

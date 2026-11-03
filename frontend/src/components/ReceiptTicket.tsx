@@ -25,8 +25,6 @@ export interface ReceiptTicketProps {
   /** "Tell them on X" posts this text; "Copy link" copies `link`. Without them the buttons are hidden. */
   shareText?: string;
   link?: string;
-  /** Shown in the draft when there is no note yet (the note field's placeholder). */
-  notePlaceholder?: string;
 }
 
 const label = "font-mono text-[11px] font-medium tracking-[0.1em] text-muted-2";
@@ -170,8 +168,8 @@ function Stop({ label: text, sub, done, grey = false }: { label: string; sub: st
   );
 }
 
-/** Spec A1 "Receipt preview": radius 22, amount 52 px, To, perforation, the note. */
-function DraftTicket({ amount, to, note, notch, notePlaceholder }: ReceiptTicketProps) {
+/** Spec A1 "Receipt preview": radius 22, amount 52 px, To, then the perforation and the note only once one is typed. */
+function DraftTicket({ amount, to, note, notch }: ReceiptTicketProps) {
   const [whole, cents] = amount ? splitAmount(amount) : ["0", ".00"];
   return (
     <div className="relative rounded-[22px] bg-ink text-white shadow-draft">
@@ -184,12 +182,16 @@ function DraftTicket({ amount, to, note, notch, notePlaceholder }: ReceiptTicket
         <span className="text-[24px] font-medium text-night-cents">{cents}</span>
         <span className="ml-2 font-mono text-[12px] font-semibold text-gold">DOGE</span>
       </div>
-      <div className="flex justify-between gap-2.5 px-[18px] pt-3.5 text-[13px]">
+      <div className={`flex justify-between gap-2.5 px-[18px] pt-3.5 text-[13px] ${note ? "" : "pb-[18px]"}`}>
         <span className="text-muted-2">To</span>
         <span className="truncate font-semibold">{to ?? "…"}</span>
       </div>
-      <div className="mt-4"><Perforation notch={notch} size={20} /></div>
-      <div className={`px-[18px] pb-[18px] pt-3 text-[14px] leading-[1.5] ${note ? "text-night-mist" : "text-muted-2"}`}>“{note || notePlaceholder}”</div>
+      {note && (
+        <>
+          <div className="mt-4"><Perforation notch={notch} size={20} /></div>
+          <div className="px-[18px] pb-[18px] pt-3 text-[14px] leading-[1.5] text-night-mist">“{note}”</div>
+        </>
+      )}
     </div>
   );
 }

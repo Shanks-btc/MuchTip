@@ -121,7 +121,7 @@ export const PERSONAS: Persona[] = [
 ];
 
 // ─── ILLUSTRATION: form defaults and placeholders (spec A1) ────────────────────────────────────────────────────────
-/** Placeholder of the Send note field, also shown greyed on the draft receipt. */
+/** Placeholder of the Send note field. Only ever the input's placeholder: never shown on a receipt or in share text. */
 export const NOTE_PLACEHOLDER = "Loved your thread on DogeOS";
 /** Preset selected when Send opens without ?amount= (spec A1 shows 25). */
 export const DEFAULT_AMOUNT = "25";

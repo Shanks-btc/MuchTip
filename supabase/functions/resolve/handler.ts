@@ -1,4 +1,4 @@
-import { clientIp, fail, HttpError, json, type Log, preflight, readJsonBody } from "../_shared/http.ts";
+import { allowedOrigin, clientIp, fail, HttpError, json, type Log, preflight, readJsonBody } from "../_shared/http.ts";
 import { idHashOf, normaliseHandle } from "../_shared/ids.ts";
 import { enforce, ipBucket, type RateLimiter } from "../_shared/ratelimit.ts";
 import type { HandleRow, HandleStore } from "../_shared/stores.ts";
@@ -46,8 +46,9 @@ const isFresh = (v: unknown) => v === true || v === "1" || v === "true";
  */
 export function createResolveHandler(d: ResolveDeps) {
   return async (req: Request): Promise<Response> => {
+    const origin = allowedOrigin(req, d.corsOrigin);
     try {
-      if (req.method === "OPTIONS") return preflight(d.corsOrigin);
+      if (req.method === "OPTIONS") return preflight(origin);
       if (req.method !== "GET" && req.method !== "POST") {
         throw new HttpError(405, "method_not_allowed", "Use GET or POST", { allow: "GET, POST, OPTIONS" });
       }
@@ -64,7 +65,7 @@ export function createResolveHandler(d: ResolveDeps) {
       if (!fresh) {
         const cached = await d.store.findByHandle(handle);
         if (cached?.handle && d.now() - Date.parse(cached.resolved_at) < d.cacheTtlMs) {
-          return json(200, body(cached, cached.handle, "cache"), d.corsOrigin);
+          return json(200, body(cached, cached.handle, "cache"), origin);
         }
       }
 
@@ -95,9 +96,9 @@ export function createResolveHandler(d: ResolveDeps) {
       };
       await d.store.upsert(row);
       d.log({ fn: "resolve", event: "resolved", source: d.mode, fresh, handle: row.handle });
-      return json(200, body(row, row.handle, d.mode), d.corsOrigin);
+      return json(200, body(row, row.handle, d.mode), origin);
     } catch (e) {
-      return fail(e, d.corsOrigin, d.log);
+      return fail(e, origin, d.log);
     }
   };
 }

@@ -19,30 +19,80 @@ function useWallets() {
   return [...(announced.length ? announced : generic), ...remote];
 }
 
-const NO_WALLET = "No wallet found. Install MetaMask, or open MuchTip in MyDoge";
-const rejected = (e: unknown) => /reject|denied/i.test((e as Error)?.message ?? "");
+export const NO_WALLET = "No wallet found. Install MetaMask (or another EVM wallet) in this browser, then try again.";
+/** A connect request the wallet never answers (locked, popup closed) stops waiting after this long. */
+export const CONNECT_TIMEOUT_MS = 30_000;
+
+export class ConnectTimeout extends Error {
+  constructor() {
+    super("The wallet didn't answer");
+  }
+}
+
+/**
+ * What to tell the user when connecting fails. Every case ends in a message and a retry, never a spinner:
+ * 4001 rejected, -32002 a request already open in the wallet, a wallet that never answered (locked or popup closed).
+ */
+export function connectErrorMessage(e: unknown): string {
+  if (e instanceof ConnectTimeout) return "Your wallet didn't answer. It may be locked or waiting in its window: open the wallet extension, unlock it, then try again.";
+  const err = e as { code?: number; cause?: { code?: number }; message?: string; shortMessage?: string } | null;
+  const code = err?.code ?? err?.cause?.code;
+  const text = `${err?.shortMessage ?? ""} ${err?.message ?? ""}`;
+  if (code === -32002 || /already pending/i.test(text)) return "Your wallet already has a connection request open. Open the wallet extension, approve or close it, then try again.";
+  if (code === 4001 || /reject|denied|cancel/i.test(text)) return "You cancelled in your wallet.";
+  return "Couldn't connect the wallet. Try again.";
+}
+
+/** Rejects with ConnectTimeout if `p` hasn't settled after `ms`. */
+export function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  let t: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([p, new Promise<never>((_, reject) => (t = setTimeout(() => reject(new ConnectTimeout()), ms)))]).finally(() => clearTimeout(t));
+}
+
+type ConnectState = { kind: "idle" } | { kind: "waiting" } | { kind: "error"; message: string };
+
+/**
+ * One connect attempt with a time limit. The UI follows this state, not wagmi's isPending (which stays true forever
+ * when a wallet never answers). If the wallet does answer late, wagmi still connects and the UI follows the account.
+ */
+function useConnectFlow() {
+  const { connectAsync } = useConnect();
+  const [state, setState] = useState<ConnectState>({ kind: "idle" });
+  const attempt = useRef(0);
+  const connect = async (c: Connector | undefined): Promise<{ ok: true } | { ok: false; message: string }> => {
+    const id = ++attempt.current;
+    if (!c) {
+      setState({ kind: "error", message: NO_WALLET });
+      return { ok: false, message: NO_WALLET };
+    }
+    setState({ kind: "waiting" });
+    try {
+      await withTimeout(connectAsync({ connector: c }), CONNECT_TIMEOUT_MS);
+      if (id === attempt.current) setState({ kind: "idle" });
+      return { ok: true };
+    } catch (e) {
+      const message = connectErrorMessage(e);
+      if (id === attempt.current) setState({ kind: "error", message });
+      return { ok: false, message };
+    }
+  };
+  return { state, connect, dismiss: () => setState({ kind: "idle" }) };
+}
 
 /** Connect for a call-to-action outside the header: the only wallet, or the browser's default (window.ethereum) one. */
 export function useConnectWallet() {
-  const { connectors, connectAsync, isPending } = useConnect();
+  const { connectors } = useConnect();
   const wallets = useWallets();
   const toast = useToast();
+  const flow = useConnectFlow();
   const connect = async (): Promise<boolean> => {
     const hasDefault = typeof window !== "undefined" && "ethereum" in window;
     const c = wallets.length === 1 || !hasDefault ? wallets[0] : connectors.find((x) => x.id === "injected");
-    if (!c || !wallets.length) {
-      toast(NO_WALLET, "error");
-      return false;
-    }
-    try {
-      await connectAsync({ connector: c });
-      return true;
-    } catch (e) {
-      toast(rejected(e) ? "You cancelled in your wallet." : "Couldn't connect the wallet", "error");
-      return false;
-    }
+    const r = await flow.connect(wallets.length ? c : undefined);
+    if (!r.ok) toast(r.message, "error", 8000);
+    return r.ok;
   };
-  return { connect, isConnecting: isPending };
+  return { connect, isConnecting: flow.state.kind === "waiting" };
 }
 
 /** Switches the wallet to Chikyū; wagmi's injected connector adds the network first when the wallet doesn't know it. */
@@ -96,7 +146,8 @@ const itemCls = "flex h-10 w-full cursor-pointer items-center gap-2.5 rounded-[7
  */
 export function WalletButton({ phone = false }: { phone?: boolean }) {
   const { status, address, balanceWei } = useWallet();
-  const { connectAsync, isPending: connecting } = useConnect();
+  const flow = useConnectFlow();
+  const connecting = flow.state.kind === "waiting";
   const { disconnect } = useDisconnect();
   const { switchToChikyu, isSwitching } = useSwitchToChikyu();
   const wallets = useWallets();
@@ -105,13 +156,11 @@ export function WalletButton({ phone = false }: { phone?: boolean }) {
   const ref = useOutside(open, () => setOpen(false));
   const size = phone ? "h-9 px-2.5 text-[12px]" : "h-10 px-[18px] text-[14px]";
 
-  const connect = async (c: Connector) => {
+  const [lastTried, setLastTried] = useState<Connector | undefined>(undefined);
+  const connect = async (c: Connector | undefined) => {
     setOpen(false);
-    try {
-      await connectAsync({ connector: c });
-    } catch (e) {
-      toast(rejected(e) ? "You cancelled in your wallet." : "Couldn't connect the wallet", "error");
-    }
+    setLastTried(c);
+    await flow.connect(c);
   };
 
   if (status === "connecting" || connecting)
@@ -153,16 +202,30 @@ export function WalletButton({ phone = false }: { phone?: boolean }) {
   }
 
   const label = phone ? "Connect" : "Connect wallet";
+  // A failed or unanswered attempt: the reason stays on screen with a retry until the user acts on it.
+  const problem = flow.state.kind === "error" && (
+    <div role="alert" className={`${menuCls} w-[min(320px,calc(100vw-32px))] p-3 text-[13px] leading-[1.45] text-ink`}>
+      <div>{flow.state.message}</div>
+      <div className="mt-2.5 flex gap-2">
+        <button type="button" className="mt-btn h-8 cursor-pointer rounded-[8px] border-0 bg-ink px-3 text-[12px] font-semibold text-white" onClick={() => connect(lastTried ?? wallets[0])}>Try again</button>
+        <button type="button" className="h-8 cursor-pointer rounded-[8px] border border-line-input bg-white px-3 text-[12px] font-semibold text-ink" onClick={flow.dismiss}>Dismiss</button>
+      </div>
+    </div>
+  );
   const btnCls = `mt-btn inline-flex cursor-pointer items-center rounded-ctl border border-ink bg-ink font-semibold text-white ${size}`;
   if (wallets.length <= 1)
     return (
-      <button type="button" className={btnCls} onClick={() => (wallets[0] ? connect(wallets[0]) : toast(NO_WALLET, "error"))}>
-        {label}
-      </button>
+      <div className="relative">
+        <button type="button" className={btnCls} onClick={() => connect(wallets[0])}>
+          {label}
+        </button>
+        {problem}
+      </div>
     );
   return (
     <div ref={ref} className="relative">
-      <button type="button" className={btnCls} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>{label}</button>
+      <button type="button" className={btnCls} aria-haspopup="menu" aria-expanded={open} onClick={() => { flow.dismiss(); setOpen((o) => !o); }}>{label}</button>
+      {!open && problem}
       {open && (
         <div role="menu" className={menuCls}>
           {wallets.map((c) => (

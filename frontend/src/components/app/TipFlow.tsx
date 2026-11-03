@@ -58,8 +58,10 @@ function Recipient({ who }: { who: ResolvedHandle }) {
  * Wiring-spec W2.10: "I just tipped you {amount} DOGE on MuchTip. Claim it with your X account: {origin}/app/claim",
  * addressed to @handle so X notifies them, with the note (client-side only, never on chain) quoted when there is one.
  */
-export const shareText = (handle: string, amountWei: bigint | null, note?: string) =>
-  `@${handle} I just tipped you ${amountWei === null ? "" : `${formatDoge(amountWei)} DOGE `}on MuchTip${note ? `: "${note}"` : ""}. Claim it with your X account: ${claimLink()}`;
+export function shareText(handle: string, amountWei: bigint | null, note?: string) {
+  const n = note?.trim(); // only a note the user typed; never the field's placeholder, never blank quotes
+  return `@${handle} I just tipped you ${amountWei === null ? "" : `${formatDoge(amountWei)} DOGE `}on MuchTip${n ? `: "${n}"` : ""}. Claim it with your X account: ${claimLink()}`;
+}
 
 interface FlowProps {
   handle: string;

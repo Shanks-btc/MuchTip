@@ -80,7 +80,7 @@ export default function Send() {
               amount={amountWei}
               to={`@${handle}`}
               note={note}
-              notePlaceholder={NOTE_PLACEHOLDER}
+             
               notch="#F4F3EE"
               from={confirmed?.from}
               sentAt={confirmed?.time}
@@ -262,7 +262,7 @@ function SendForm({ phone, onReview }: { phone: boolean; onReview: (to: string, 
           <p className="m-0 mt-2.5 text-center text-[12px] text-muted">Not claimed within {windowText}? You can take it back from My tips.</p>
         </div>
         <ReceiptColumn
-          ticket={<ReceiptTicket status="draft" amount={f.amountWei} to={f.lookup.kind === "found" ? `@${f.lookup.who.handle}` : f.input ? `@${f.input}` : null} note={f.note.trim()} notePlaceholder={NOTE_PLACEHOLDER} notch="#F4F3EE" />}
+          ticket={<ReceiptTicket status="draft" amount={f.amountWei} to={f.lookup.kind === "found" ? `@${f.lookup.who.handle}` : f.input ? `@${f.input}` : null} note={f.note.trim()} notch="#F4F3EE" />}
         />
       </div>
     </>

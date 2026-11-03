@@ -55,7 +55,8 @@ export function normalizeHandle(raw: string) {
 }
 
 /**
- * Wiring-spec section 6: what to show for a backend error code. `handle` fills "No X account called @…".
+ * Wiring-spec section 6: what to show for a backend error code. Only handle_not_found says "No X account called @…";
+ * a network or CORS failure, X being down, rate limits, a missing backend config and a demo miss each have their own.
  * Unknown codes fall back to the server's own message (they are written for people).
  */
 export function apiErrorMessage(e: unknown, ctx: { handle?: string } = {}): string {
@@ -81,8 +82,11 @@ export function apiErrorMessage(e: unknown, ctx: { handle?: string } = {}): stri
     case "verifier_mismatch":
       return "Claiming is unavailable right now. Your tips are safe in the contract.";
     case "network":
+      return OFFLINE; // also what a CORS rejection looks like from the browser
     case "backend_not_configured":
-      return OFFLINE;
+      return "Handle lookups aren't available on this site yet: its backend isn't configured.";
+    case "demo_unknown":
+      return `Demo mode: @${ctx.handle ?? "that handle"} isn't one of the demo accounts. Nothing was checked with X.`;
     default:
       return e.message || OFFLINE;
   }
@@ -98,7 +102,9 @@ export async function resolveHandle(handle: string, opts: { fresh?: boolean; sig
   if (demoMode) {
     await new Promise((r) => setTimeout(r, 300));
     const a = DEMO_ACCOUNTS[h.toLowerCase()];
-    return a ? { ...a, idHash: idHashOf(a.xId), source: "demo" } : null;
+    // A handle outside the demo list is NOT "no such X account": nothing was asked of X (see apiErrorMessage)
+    if (!a) throw new ApiError(0, "demo_unknown", "Not a demo account", "resolve");
+    return { ...a, idHash: idHashOf(a.xId), source: "demo" };
   }
   const q = new URLSearchParams({ handle: h });
   if (opts.fresh) q.set("fresh", "1");

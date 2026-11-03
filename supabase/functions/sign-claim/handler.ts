@@ -2,7 +2,7 @@ import { ChainError, type Chain } from "../_shared/chain.ts";
 import { type ClaimSigner, signClaim } from "../_shared/eip712.ts";
 import { ethers } from "../_shared/eth.ts";
 import { xIdFromUser } from "../_shared/claim-gate.ts";
-import { clientIp, fail, HttpError, json, type Log, preflight, readJsonBody } from "../_shared/http.ts";
+import { allowedOrigin, clientIp, fail, HttpError, json, type Log, preflight, readJsonBody } from "../_shared/http.ts";
 import { idHashOf } from "../_shared/ids.ts";
 import { enforce, ipBucket, type RateLimiter } from "../_shared/ratelimit.ts";
 import type { AuthPort } from "../_shared/supabase.ts";
@@ -56,8 +56,9 @@ function bearerToken(req: Request): string {
  */
 export function createSignClaimHandler(d: SignClaimDeps) {
   return async (req: Request): Promise<Response> => {
+    const origin = allowedOrigin(req, d.corsOrigin);
     try {
-      if (req.method === "OPTIONS") return preflight(d.corsOrigin);
+      if (req.method === "OPTIONS") return preflight(origin);
       if (req.method !== "POST") throw new HttpError(405, "method_not_allowed", "Use POST", { allow: "POST, OPTIONS" });
 
       const jwt = bearerToken(req);
@@ -110,9 +111,9 @@ export function createSignClaimHandler(d: SignClaimDeps) {
         chainId: Number(d.chain.chainId),
         unclaimedWei: String(ctx.unclaimed),
         claimable: ctx.unclaimed > 0n,
-      }, d.corsOrigin);
+      }, origin);
     } catch (e) {
-      return fail(e, d.corsOrigin, d.log);
+      return fail(e, origin, d.log);
     }
   };
 }

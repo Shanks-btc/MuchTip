@@ -12,9 +12,23 @@ export class HttpError extends Error {
 
 export type Log = (entry: Record<string, unknown>) => void;
 
+/**
+ * The Access-Control-Allow-Origin for a request. CORS_ALLOW_ORIGIN may be one origin, "*", or a comma-separated list
+ * (e.g. the production site and http://localhost:5173). With a list, the request's Origin is echoed only if it is
+ * listed; any other caller gets the first entry, which its browser then rejects. One value behaves as before.
+ */
+export function allowedOrigin(req: Request, configured: string): string {
+  const list = configured.split(",").map((s) => s.trim().replace(/\/+$/, "")).filter(Boolean);
+  if (list.length <= 1) return list[0] ?? "*";
+  const origin = req.headers.get("origin");
+  return origin !== null && list.includes(origin) ? origin : list[0];
+}
+
 export function corsHeaders(origin: string): Record<string, string> {
   return {
     "access-control-allow-origin": origin,
+    // the header depends on the caller when CORS_ALLOW_ORIGIN is a list; caches (feed is public, 3 s) must key on it
+    vary: "Origin",
     "access-control-allow-headers": "authorization, x-client-info, apikey, content-type",
     "access-control-allow-methods": "GET, POST, OPTIONS",
     "access-control-max-age": "86400",

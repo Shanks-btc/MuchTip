@@ -5,7 +5,7 @@ import { createChain, ChainError } from "./chain.ts";
 import { claimDigest, CLAIM_TYPES, signClaim } from "./eip712.ts";
 import { chainConfig, intEnv } from "./env.ts";
 import { ethers } from "./eth.ts";
-import { HttpError } from "./http.ts";
+import { allowedOrigin, HttpError } from "./http.ts";
 import { idHashOf, normaliseHandle } from "./ids.ts";
 import { decodeLogs, syncEvents } from "./indexer.ts";
 import { enforce, ipBucket } from "./ratelimit.ts";
@@ -504,4 +504,17 @@ Deno.test("syncEvents: an RPC failure mid-sync keeps the chunks already stored a
   assertEquals(store.state.get(C)?.lastBlock, 1099);
   assertEquals(store.state.get(C)?.leaseOwner, null);
   assertEquals(store.events.size, 1);
+});
+
+Deno.test("allowedOrigin: one value and * are unchanged; a list echoes only listed origins", () => {
+  const req = (origin?: string) => new Request("http://f/x", { headers: origin ? { origin } : {} });
+  assertEquals(allowedOrigin(req("https://a.example"), "*"), "*");
+  assertEquals(allowedOrigin(req("https://a.example"), "https://site.example"), "https://site.example");
+  assertEquals(allowedOrigin(req(), ""), "*");
+  const list = "https://site.example,http://localhost:5173";
+  assertEquals(allowedOrigin(req("http://localhost:5173"), list), "http://localhost:5173");
+  assertEquals(allowedOrigin(req("https://site.example"), list), "https://site.example");
+  assertEquals(allowedOrigin(req("https://other.example"), list), "https://site.example");
+  assertEquals(allowedOrigin(req("http://localhost:5174"), list), "https://site.example");
+  assertEquals(allowedOrigin(req(), list), "https://site.example");
 });

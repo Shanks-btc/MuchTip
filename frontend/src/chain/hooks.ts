@@ -45,12 +45,23 @@ export function useEscrowConfig() {
 
 export type WalletStatus = "disconnected" | "connecting" | "connected" | "wrong-network";
 
+/** wagmi's (re)connecting state is trusted for this long; a wallet that never answers then reads as disconnected. */
+export const RECONNECT_GRACE_MS = 10_000;
+
 /** The connected wallet as the UI needs it. The balance is read on Chikyū even if the wallet is on another chain. */
 export function useWallet() {
   const { address, status, chainId } = useAccount();
   const balance = useBalance({ address, chainId: CHAIN_ID, query: { enabled: Boolean(address), refetchInterval: 15_000 } });
+  // A reconnect on page load can hang when the wallet never answers (locked, stuck request). After the grace period the
+  // UI shows "Connect wallet" again instead of a spinner that never stops; a late answer still connects.
+  const connecting = status === "connecting" || status === "reconnecting";
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setStuck(connecting), connecting ? RECONNECT_GRACE_MS : 0);
+    return () => clearTimeout(t);
+  }, [connecting]);
   const s: WalletStatus =
-    status === "connecting" || status === "reconnecting" ? "connecting" : status !== "connected" ? "disconnected" : chainId !== CHAIN_ID ? "wrong-network" : "connected";
+    connecting ? (stuck ? "disconnected" : "connecting") : status !== "connected" ? "disconnected" : chainId !== CHAIN_ID ? "wrong-network" : "connected";
   return { status: s, address, balanceWei: balance.data?.value, refetchBalance: balance.refetch };
 }
 

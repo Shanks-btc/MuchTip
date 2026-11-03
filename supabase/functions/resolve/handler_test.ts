@@ -295,3 +295,18 @@ Deno.test("name: a missing display name is null, not an error", async () => {
   const b = await (await setup().call("DogeXFanY42", "POST", {}, true)).json();
   assertEquals([b.xId, b.name], ["999", null]);
 });
+
+Deno.test("resolve: CORS_ALLOW_ORIGIN as a list echoes only a listed Origin, with Vary: Origin", async () => {
+  const { handler } = setup({ corsOrigin: "https://muchtip.vercel.app, http://localhost:5173/" });
+  const from = (origin?: string) =>
+    handler(new Request("http://f/resolve?handle=XDevelopers", { headers: origin ? { origin } : {} }));
+  const pre = await handler(new Request("http://f/resolve", { method: "OPTIONS", headers: { origin: "http://localhost:5173" } }));
+  assertEquals([pre.status, pre.headers.get("access-control-allow-origin"), pre.headers.get("vary")], [204, "http://localhost:5173", "Origin"]);
+  assertEquals((await from("https://muchtip.vercel.app")).headers.get("access-control-allow-origin"), "https://muchtip.vercel.app");
+  assertEquals((await from("http://localhost:5173")).headers.get("access-control-allow-origin"), "http://localhost:5173"); // trailing slash in the setting is ignored
+  // anyone else gets the first entry, which their browser rejects; no Origin header (curl, servers) gets it too
+  assertEquals((await from("https://evil.example")).headers.get("access-control-allow-origin"), "https://muchtip.vercel.app");
+  assertEquals((await from()).headers.get("access-control-allow-origin"), "https://muchtip.vercel.app");
+  // a prefix trick is not a match
+  assertEquals((await from("https://muchtip.vercel.app.evil.example")).headers.get("access-control-allow-origin"), "https://muchtip.vercel.app");
+});

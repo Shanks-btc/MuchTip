@@ -29,3 +29,6 @@ dogeos_ecosystem.md
 frontend/dist/
 # Vercel CLI link (project/org ids)
 frontend/.vercel/
+
+# Supabase CLI local state (linked project ref, CLI version cache)
+supabase/.temp/

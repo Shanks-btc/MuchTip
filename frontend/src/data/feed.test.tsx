@@ -25,5 +25,5 @@ describe("useFeed without a backend", () => {
     const p = renderHook(() => prod.useFeed("All", 25), { wrapper }).result.current;
     expect(p).toMatchObject({ kind: "error", data: null });
     vi.unstubAllEnvs();
-  });
+  }, 30_000); // two fresh module graphs: can pass vitest's 5 s default when the whole suite runs in parallel
 });
